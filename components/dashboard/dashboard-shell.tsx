@@ -19,22 +19,22 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex min-h-screen bg-background">
       {/* Sidebar - Desktop */}
-      <aside className="hidden lg:flex lg:w-72 lg:flex-col lg:fixed lg:inset-y-0 bg-card border-r border-border/50">
+      <aside className="hidden lg:flex lg:w-64 lg:flex-col lg:fixed lg:inset-y-0 bg-card border-r border-border">
         <div className="flex flex-col h-full">
           {/* Logo */}
-          <div className="flex items-center gap-2 px-6 py-6 border-b border-border/50">
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+          <div className="flex items-center gap-2.5 px-5 py-5 border-b border-border">
+            <div className="flex h-7 w-7 items-center justify-center rounded-md bg-primary">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-primary-foreground">
                 <path d="M12 2L2 7l10 5 10-5-10-5z" />
                 <path d="M2 17l10 5 10-5" />
                 <path d="M2 12l10 5 10-5" />
               </svg>
             </div>
-            <span className="text-lg font-bold text-foreground tracking-tight">LivestockAI</span>
+            <span className="text-base font-bold text-foreground tracking-tight">LivestockAI</span>
           </div>
 
           {/* Nav */}
-          <nav className="flex-1 px-4 py-6 flex flex-col gap-1">
+          <nav className="flex-1 px-3 py-4 flex flex-col gap-0.5">
             {navItems.map((item) => {
               const isActive = pathname === item.href
               const Icon = item.icon
@@ -42,13 +42,13 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition-all ${
+                  className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all ${
                     isActive
-                      ? "bg-primary text-primary-foreground shadow-lg shadow-primary/20"
-                      : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                      ? "bg-primary/10 text-primary"
+                      : "text-muted-foreground hover:bg-secondary hover:text-foreground"
                   }`}
                 >
-                  <Icon className="h-5 w-5" />
+                  <Icon className="h-4 w-4" />
                   {item.label}
                 </Link>
               )
@@ -56,13 +56,13 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
           </nav>
 
           {/* Bottom */}
-          <div className="border-t border-border/50 px-4 py-4 flex flex-col gap-1">
-            <Link href="/" className="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground transition-all">
-              <Home className="h-5 w-5" />
+          <div className="border-t border-border px-3 py-3 flex flex-col gap-0.5">
+            <Link href="/" className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-muted-foreground hover:bg-secondary hover:text-foreground transition-all">
+              <Home className="h-4 w-4" />
               Home
             </Link>
-            <Link href="/login" className="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground transition-all">
-              <LogOut className="h-5 w-5" />
+            <Link href="/login" className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-muted-foreground hover:bg-secondary hover:text-foreground transition-all">
+              <LogOut className="h-4 w-4" />
               Log Out
             </Link>
           </div>
@@ -70,10 +70,10 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
       </aside>
 
       {/* Mobile header */}
-      <div className="lg:hidden fixed top-0 left-0 right-0 z-50 flex items-center justify-between bg-card/95 backdrop-blur-xl border-b border-border/50 px-4 py-3">
+      <div className="lg:hidden fixed top-0 left-0 right-0 z-50 flex items-center justify-between bg-card/95 backdrop-blur-xl border-b border-border px-4 py-3">
         <Link href="/" className="flex items-center gap-2">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+          <div className="flex h-7 w-7 items-center justify-center rounded-md bg-primary">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-primary-foreground">
               <path d="M12 2L2 7l10 5 10-5-10-5z" />
               <path d="M2 17l10 5 10-5" />
               <path d="M2 12l10 5 10-5" />
@@ -83,7 +83,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
         </Link>
         <button
           onClick={() => setSidebarOpen(!sidebarOpen)}
-          className="rounded-xl p-2 text-foreground hover:bg-muted transition-colors"
+          className="rounded-lg p-2 text-foreground hover:bg-secondary transition-colors"
           aria-label={sidebarOpen ? "Close menu" : "Open menu"}
         >
           {sidebarOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
@@ -93,10 +93,10 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
       {/* Mobile sidebar overlay */}
       {sidebarOpen && (
         <>
-          <div className="lg:hidden fixed inset-0 z-40 bg-foreground/20 backdrop-blur-sm" onClick={() => setSidebarOpen(false)} />
-          <div className="lg:hidden fixed inset-y-0 left-0 z-50 w-72 bg-card border-r border-border/50 shadow-2xl">
-            <div className="flex flex-col h-full pt-16">
-              <nav className="flex-1 px-4 py-4 flex flex-col gap-1">
+          <div className="lg:hidden fixed inset-0 z-40 bg-background/60 backdrop-blur-sm" onClick={() => setSidebarOpen(false)} />
+          <div className="lg:hidden fixed inset-y-0 left-0 z-50 w-64 bg-card border-r border-border">
+            <div className="flex flex-col h-full pt-14">
+              <nav className="flex-1 px-3 py-4 flex flex-col gap-0.5">
                 {navItems.map((item) => {
                   const isActive = pathname === item.href
                   const Icon = item.icon
@@ -105,21 +105,21 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
                       key={item.href}
                       href={item.href}
                       onClick={() => setSidebarOpen(false)}
-                      className={`flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition-all ${
+                      className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all ${
                         isActive
-                          ? "bg-primary text-primary-foreground shadow-lg shadow-primary/20"
-                          : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                          ? "bg-primary/10 text-primary"
+                          : "text-muted-foreground hover:bg-secondary hover:text-foreground"
                       }`}
                     >
-                      <Icon className="h-5 w-5" />
+                      <Icon className="h-4 w-4" />
                       {item.label}
                     </Link>
                   )
                 })}
               </nav>
-              <div className="border-t border-border/50 px-4 py-4">
-                <Link href="/login" onClick={() => setSidebarOpen(false)} className="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground transition-all">
-                  <LogOut className="h-5 w-5" />
+              <div className="border-t border-border px-3 py-3">
+                <Link href="/login" onClick={() => setSidebarOpen(false)} className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-muted-foreground hover:bg-secondary hover:text-foreground transition-all">
+                  <LogOut className="h-4 w-4" />
                   Log Out
                 </Link>
               </div>
@@ -129,7 +129,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
       )}
 
       {/* Main content */}
-      <main className="flex-1 lg:pl-72">
+      <main className="flex-1 lg:pl-64">
         <div className="pt-16 lg:pt-0 px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
           {children}
         </div>

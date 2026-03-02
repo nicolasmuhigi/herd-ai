@@ -66,64 +66,62 @@ export default function AssistantPage() {
 
   return (
     <div className="mx-auto flex h-[calc(100vh-8rem)] max-w-3xl flex-col lg:h-[calc(100vh-4rem)]">
-      {/* Header */}
-      <div className="mb-6 flex-shrink-0">
+      <div className="mb-4 flex-shrink-0">
         <h1 className="text-2xl font-bold text-foreground lg:text-3xl">AI Assistant</h1>
-        <p className="mt-2 text-base text-muted-foreground">
+        <p className="mt-1 text-sm text-muted-foreground">
           Get expert-level guidance based on your analysis results.
         </p>
       </div>
 
-      {/* Chat area */}
-      <div className="flex-1 rounded-3xl bg-card border border-border/50 shadow-lg shadow-primary/5 flex flex-col overflow-hidden">
-        {/* Online indicator */}
-        <div className="flex items-center gap-2 border-b border-border/50 px-6 py-4">
-          <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-primary/10">
-            <Bot className="h-4 w-4 text-primary" />
+      <div className="flex-1 rounded-2xl border border-border bg-card flex flex-col overflow-hidden">
+        {/* Header */}
+        <div className="flex items-center gap-3 border-b border-border px-5 py-3.5">
+          <div className="flex h-7 w-7 items-center justify-center rounded-md bg-primary/10">
+            <Bot className="h-3.5 w-3.5 text-primary" />
           </div>
           <div>
             <span className="text-sm font-semibold text-foreground">LivestockAI Assistant</span>
-            <span className="flex items-center gap-1.5 text-xs text-emerald-600">
-              <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" /> Online
+            <span className="flex items-center gap-1.5 text-xs text-emerald-400">
+              <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" /> Online
             </span>
           </div>
         </div>
 
         {/* Messages */}
-        <div ref={scrollRef} className="flex-1 overflow-y-auto px-4 py-6 space-y-4 sm:px-6">
+        <div ref={scrollRef} className="flex-1 overflow-y-auto px-4 py-6 space-y-4 sm:px-5">
           {messages.map((msg) => (
             <div
               key={msg.id}
-              className={`flex gap-3 animate-fade-in-up ${msg.role === "user" ? "justify-end" : "justify-start"}`}
+              className={`flex gap-2.5 ${msg.role === "user" ? "justify-end" : "justify-start"}`}
             >
               {msg.role === "assistant" && (
-                <div className="flex-shrink-0 h-8 w-8 rounded-xl bg-secondary/30 flex items-center justify-center mt-1">
-                  <Bot className="h-4 w-4 text-primary" />
+                <div className="flex-shrink-0 h-7 w-7 rounded-md bg-primary/10 flex items-center justify-center mt-0.5">
+                  <Bot className="h-3.5 w-3.5 text-primary" />
                 </div>
               )}
               <div
-                className={`max-w-[80%] rounded-2xl px-4 py-3 text-sm leading-relaxed ${
+                className={`max-w-[80%] rounded-xl px-4 py-2.5 text-sm leading-relaxed ${
                   msg.role === "user"
-                    ? "rounded-tr-md bg-primary text-primary-foreground"
-                    : "rounded-tl-md bg-secondary/20 text-foreground"
+                    ? "bg-primary text-primary-foreground"
+                    : "bg-secondary text-foreground border border-border"
                 }`}
               >
                 {msg.content}
               </div>
               {msg.role === "user" && (
-                <div className="flex-shrink-0 h-8 w-8 rounded-xl bg-primary/10 flex items-center justify-center mt-1">
-                  <User className="h-4 w-4 text-primary" />
+                <div className="flex-shrink-0 h-7 w-7 rounded-md bg-secondary flex items-center justify-center mt-0.5 border border-border">
+                  <User className="h-3.5 w-3.5 text-muted-foreground" />
                 </div>
               )}
             </div>
           ))}
 
           {isTyping && (
-            <div className="flex gap-3 justify-start">
-              <div className="flex-shrink-0 h-8 w-8 rounded-xl bg-secondary/30 flex items-center justify-center mt-1">
-                <Bot className="h-4 w-4 text-primary" />
+            <div className="flex gap-2.5 justify-start">
+              <div className="flex-shrink-0 h-7 w-7 rounded-md bg-primary/10 flex items-center justify-center mt-0.5">
+                <Bot className="h-3.5 w-3.5 text-primary" />
               </div>
-              <div className="rounded-2xl rounded-tl-md bg-secondary/20 px-4 py-3 text-sm text-muted-foreground">
+              <div className="rounded-xl bg-secondary px-4 py-3 text-sm text-muted-foreground border border-border">
                 <span className="flex items-center gap-1">
                   <span className="h-1.5 w-1.5 rounded-full bg-muted-foreground animate-bounce" />
                   <span className="h-1.5 w-1.5 rounded-full bg-muted-foreground animate-bounce animation-delay-200" />
@@ -135,8 +133,8 @@ export default function AssistantPage() {
         </div>
 
         {/* Input */}
-        <div className="border-t border-border/50 p-4">
-          <div className="flex items-center gap-2 rounded-2xl bg-background border border-border/50 p-2">
+        <div className="border-t border-border p-4">
+          <div className="flex items-center gap-2 rounded-xl bg-secondary border border-border p-1.5">
             <input
               type="text"
               value={input}
@@ -153,13 +151,13 @@ export default function AssistantPage() {
             <button
               onClick={sendMessage}
               disabled={!input.trim() || isTyping}
-              className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary text-primary-foreground transition-all hover:bg-accent disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground transition-all hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed"
               aria-label="Send message"
             >
-              <Send className="h-4 w-4" />
+              <Send className="h-3.5 w-3.5" />
             </button>
           </div>
-          <p className="mt-2 text-center text-xs text-muted-foreground">
+          <p className="mt-2 text-center text-xs text-muted-foreground/60">
             AI responses are advisory only. Always consult a licensed veterinarian for medical decisions.
           </p>
         </div>

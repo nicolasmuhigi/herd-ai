@@ -57,16 +57,16 @@ export default function BookingPage() {
   if (booked) {
     return (
       <div className="mx-auto max-w-lg flex min-h-[60vh] items-center justify-center">
-        <div className="rounded-3xl bg-card border border-border/50 p-10 text-center shadow-xl shadow-primary/5 animate-fade-in-up">
-          <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-emerald-100">
-            <CheckCircle2 className="h-8 w-8 text-emerald-600" />
+        <div className="rounded-2xl border border-border bg-card p-10 text-center animate-fade-in-up">
+          <div className="mx-auto mb-6 flex h-14 w-14 items-center justify-center rounded-xl bg-emerald-500/10">
+            <CheckCircle2 className="h-7 w-7 text-emerald-400" />
           </div>
           <h2 className="text-2xl font-bold text-foreground">Appointment Booked!</h2>
-          <p className="mt-3 text-base text-muted-foreground">
+          <p className="mt-3 text-sm text-muted-foreground">
             Your appointment with <span className="font-semibold text-foreground">{vets[selectedVet!].name}</span> has been
             confirmed for <span className="font-semibold text-foreground">{timeSlots[selectedSlot!]}</span>.
           </p>
-          <div className="mt-6 rounded-2xl bg-primary/5 border border-primary/10 p-4">
+          <div className="mt-6 rounded-xl bg-primary/5 border border-primary/10 p-4">
             <p className="text-sm text-primary font-medium">
               A confirmation email has been sent. The vet will also receive your latest analysis results for review.
             </p>
@@ -78,7 +78,7 @@ export default function BookingPage() {
               setSelectedSlot(null)
               setNotes("")
             }}
-            className="mt-6 inline-flex items-center gap-2 rounded-xl bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground shadow-lg shadow-primary/25 transition-all hover:shadow-xl hover:-translate-y-0.5"
+            className="mt-6 inline-flex items-center gap-2 rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition-all hover:bg-primary/90"
           >
             Book Another
           </button>
@@ -91,36 +91,36 @@ export default function BookingPage() {
     <div className="mx-auto max-w-3xl">
       <div className="mb-8">
         <h1 className="text-2xl font-bold text-foreground lg:text-3xl">Book a Veterinary Expert</h1>
-        <p className="mt-2 text-base text-muted-foreground">
+        <p className="mt-2 text-sm text-muted-foreground">
           Connect with certified veterinary professionals for on-site consultations and treatment plans.
         </p>
       </div>
 
       {/* Vet selection */}
       <div className="mb-8">
-        <h2 className="mb-4 text-lg font-bold text-foreground">Select a Veterinarian</h2>
-        <div className="flex flex-col gap-3">
+        <h2 className="mb-4 text-sm font-semibold uppercase tracking-wider text-muted-foreground">Select a Veterinarian</h2>
+        <div className="flex flex-col gap-2">
           {vets.map((vet, i) => (
             <button
               key={vet.name}
               onClick={() => setSelectedVet(i)}
-              className={`flex items-center gap-4 rounded-2xl border p-5 text-left transition-all ${
+              className={`flex items-center gap-4 rounded-xl border p-4 text-left transition-all ${
                 selectedVet === i
-                  ? "border-primary bg-primary/5 shadow-lg shadow-primary/10"
-                  : "border-border/50 bg-card hover:border-primary/30 hover:bg-primary/5"
+                  ? "border-primary bg-primary/5"
+                  : "border-border bg-card hover:border-primary/30"
               }`}
             >
-              <div className={`flex h-14 w-14 items-center justify-center rounded-2xl text-xl font-bold ${
+              <div className={`flex h-11 w-11 items-center justify-center rounded-lg text-base font-bold ${
                 selectedVet === i
                   ? "bg-primary text-primary-foreground"
-                  : "bg-secondary/30 text-primary"
+                  : "bg-secondary text-muted-foreground border border-border"
               }`}>
                 {vet.initial}
               </div>
               <div className="flex-1 min-w-0">
-                <div className="text-base font-bold text-foreground">{vet.name}</div>
-                <div className="text-sm text-muted-foreground">{vet.specialty}</div>
-                <div className="mt-1.5 flex items-center gap-4 text-xs text-muted-foreground">
+                <div className="text-sm font-bold text-foreground">{vet.name}</div>
+                <div className="text-xs text-muted-foreground">{vet.specialty}</div>
+                <div className="mt-1 flex items-center gap-4 text-xs text-muted-foreground">
                   <span className="flex items-center gap-1">
                     <Star className="h-3 w-3 fill-amber-400 text-amber-400" />
                     <span className="font-semibold text-foreground">{vet.rating}</span>
@@ -132,12 +132,12 @@ export default function BookingPage() {
                   </span>
                 </div>
               </div>
-              <div className={`flex h-6 w-6 items-center justify-center rounded-full border-2 transition-colors ${
+              <div className={`flex h-5 w-5 items-center justify-center rounded-full border-2 transition-colors ${
                 selectedVet === i
                   ? "border-primary bg-primary"
                   : "border-border"
               }`}>
-                {selectedVet === i && <CheckCircle2 className="h-4 w-4 text-primary-foreground" />}
+                {selectedVet === i && <CheckCircle2 className="h-3 w-3 text-primary-foreground" />}
               </div>
             </button>
           ))}
@@ -146,16 +146,16 @@ export default function BookingPage() {
 
       {/* Time slot selection */}
       <div className="mb-8">
-        <h2 className="mb-4 text-lg font-bold text-foreground">Choose a Time Slot</h2>
+        <h2 className="mb-4 text-sm font-semibold uppercase tracking-wider text-muted-foreground">Choose a Time Slot</h2>
         <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
           {timeSlots.map((slot, i) => (
             <button
               key={slot}
               onClick={() => setSelectedSlot(i)}
-              className={`flex items-center justify-center gap-2 rounded-xl p-3.5 text-sm font-semibold transition-all ${
+              className={`flex items-center justify-center gap-2 rounded-lg p-3 text-sm font-medium transition-all ${
                 selectedSlot === i
-                  ? "bg-primary text-primary-foreground shadow-lg shadow-primary/25"
-                  : "bg-card text-foreground border border-border/50 hover:border-primary/30 hover:bg-primary/5"
+                  ? "bg-primary text-primary-foreground"
+                  : "bg-card text-foreground border border-border hover:border-primary/30"
               }`}
             >
               <Clock className="h-3.5 w-3.5" />
@@ -167,21 +167,21 @@ export default function BookingPage() {
 
       {/* Notes */}
       <div className="mb-8">
-        <h2 className="mb-4 text-lg font-bold text-foreground">Additional Notes</h2>
+        <h2 className="mb-4 text-sm font-semibold uppercase tracking-wider text-muted-foreground">Additional Notes</h2>
         <textarea
           value={notes}
           onChange={(e) => setNotes(e.target.value)}
           placeholder="Describe symptoms, number of affected animals, or any other relevant details..."
           rows={4}
-          className="w-full rounded-2xl border border-border bg-card px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground outline-none transition-all focus:border-accent focus:ring-2 focus:ring-accent/20 resize-none"
+          className="w-full rounded-xl border border-border bg-secondary px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground outline-none transition-all focus:border-primary focus:ring-1 focus:ring-primary/30 resize-none"
         />
       </div>
 
       {/* Booking info */}
-      <div className="mb-6 rounded-2xl bg-primary/5 border border-primary/10 p-4">
+      <div className="mb-6 rounded-xl bg-primary/5 border border-primary/10 p-4">
         <div className="flex items-start gap-2 text-sm text-primary font-medium">
           <CalendarCheck className="h-4 w-4 mt-0.5 flex-shrink-0" />
-          <span>Appointment includes: on-site visit, full diagnostics, treatment plan, and follow-up support. Your analysis results will be shared with the veterinarian.</span>
+          <span>Appointment includes: on-site visit, full diagnostics, treatment plan, and follow-up support.</span>
         </div>
       </div>
 
@@ -189,10 +189,10 @@ export default function BookingPage() {
       <button
         onClick={handleBook}
         disabled={selectedVet === null || selectedSlot === null}
-        className="group flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-primary to-accent px-6 py-4 text-base font-semibold text-primary-foreground shadow-lg shadow-primary/25 transition-all hover:shadow-xl hover:shadow-primary/30 hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:hover:shadow-lg"
+        className="group flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground transition-all hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed"
       >
         Confirm Booking
-        <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+        <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
       </button>
     </div>
   )

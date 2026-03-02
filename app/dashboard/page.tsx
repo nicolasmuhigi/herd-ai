@@ -40,16 +40,14 @@ export default function UploadPage() {
 
   return (
     <div className="mx-auto max-w-3xl">
-      {/* Page header */}
       <div className="mb-8">
         <h1 className="text-2xl font-bold text-foreground lg:text-3xl">Upload Image</h1>
-        <p className="mt-2 text-base text-muted-foreground">
+        <p className="mt-2 text-sm text-muted-foreground">
           Upload a photo of your livestock for AI-powered disease detection and analysis.
         </p>
       </div>
 
-      {/* Upload card */}
-      <div className="rounded-3xl bg-card border border-border/50 p-6 shadow-lg shadow-primary/5 sm:p-8">
+      <div className="rounded-2xl border border-border bg-card p-6 sm:p-8">
         <div
           onDragOver={(e) => { e.preventDefault(); setIsDragging(true) }}
           onDragLeave={() => setIsDragging(false)}
@@ -59,27 +57,26 @@ export default function UploadPage() {
           tabIndex={0}
           aria-label="Upload area. Click or drag and drop images here."
           onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") handleFileSelect() }}
-          className={`cursor-pointer rounded-2xl border-2 border-dashed p-12 text-center transition-all ${
+          className={`cursor-pointer rounded-xl border-2 border-dashed p-12 text-center transition-all ${
             isDragging
-              ? "border-primary bg-primary/5 scale-[1.02]"
-              : "border-border hover:border-primary/50 hover:bg-primary/5"
+              ? "border-primary bg-primary/5"
+              : "border-border hover:border-primary/40 hover:bg-primary/5"
           }`}
         >
-          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10">
-            <Upload className="h-7 w-7 text-primary" />
+          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">
+            <Upload className="h-5 w-5 text-primary" />
           </div>
-          <p className="text-base font-semibold text-foreground">Drop your images here</p>
-          <p className="mt-1 text-sm text-muted-foreground">or click to browse your files</p>
-          <p className="mt-3 text-xs text-muted-foreground">Supports JPG, PNG, WebP up to 25MB</p>
+          <p className="text-sm font-semibold text-foreground">Drop your images here</p>
+          <p className="mt-1 text-xs text-muted-foreground">or click to browse your files</p>
+          <p className="mt-3 text-xs text-muted-foreground/60">Supports JPG, PNG, WebP up to 25MB</p>
         </div>
 
-        {/* File list */}
         {files.length > 0 && (
-          <div className="mt-6 space-y-3">
-            <h3 className="text-sm font-semibold text-foreground">Selected Files</h3>
+          <div className="mt-6 space-y-2">
+            <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Selected Files</h3>
             {files.map((file, i) => (
-              <div key={`${file.name}-${i}`} className="flex items-center gap-3 rounded-xl bg-background border border-border/50 p-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-secondary/30">
+              <div key={`${file.name}-${i}`} className="flex items-center gap-3 rounded-lg bg-secondary border border-border p-3">
+                <div className="flex h-8 w-8 items-center justify-center rounded-md bg-primary/10">
                   <ImageIcon className="h-4 w-4 text-primary" />
                 </div>
                 <div className="flex-1 min-w-0">
@@ -88,7 +85,7 @@ export default function UploadPage() {
                 </div>
                 <button
                   onClick={(e) => { e.stopPropagation(); removeFile(i) }}
-                  className="rounded-lg p-1.5 text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+                  className="rounded-md p-1.5 text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
                   aria-label={`Remove ${file.name}`}
                 >
                   <X className="h-4 w-4" />
@@ -98,11 +95,10 @@ export default function UploadPage() {
           </div>
         )}
 
-        {/* Analyze button */}
         <button
           onClick={handleAnalyze}
           disabled={files.length === 0 || isAnalyzing}
-          className="mt-6 group flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-primary to-accent px-6 py-3.5 text-sm font-semibold text-primary-foreground shadow-lg shadow-primary/25 transition-all hover:shadow-xl hover:shadow-primary/30 hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:hover:shadow-lg"
+          className="mt-6 group flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-6 py-2.5 text-sm font-semibold text-primary-foreground transition-all hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {isAnalyzing ? (
             <>
@@ -118,16 +114,15 @@ export default function UploadPage() {
         </button>
       </div>
 
-      {/* Info cards */}
-      <div className="mt-8 grid gap-4 sm:grid-cols-3">
+      <div className="mt-6 grid gap-3 sm:grid-cols-3">
         {[
           { title: "Fast Analysis", desc: "Results in under 10 seconds" },
           { title: "Multi-Disease", desc: "Checks 50+ known diseases" },
           { title: "High Accuracy", desc: "94%+ detection confidence" },
         ].map((info) => (
-          <div key={info.title} className="rounded-2xl bg-card border border-border/50 p-5 text-center">
-            <p className="text-sm font-bold text-foreground">{info.title}</p>
-            <p className="mt-1 text-xs text-muted-foreground">{info.desc}</p>
+          <div key={info.title} className="rounded-xl border border-border bg-card p-4 text-center">
+            <p className="text-sm font-semibold text-foreground">{info.title}</p>
+            <p className="mt-0.5 text-xs text-muted-foreground">{info.desc}</p>
           </div>
         ))}
       </div>
