@@ -3,44 +3,68 @@
 
 @custom-variant dark (&:is(.dark *));
 
+@font-face {
+  font-family: 'Neue Montreal';
+  src: url('https://cdn.jsdelivr.net/gh/niccoloboanini/fonts@main/PPNeueMontreal-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Neue Montreal';
+  src: url('https://cdn.jsdelivr.net/gh/niccoloboanini/fonts@main/PPNeueMontreal-Medium.woff2') format('woff2');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Neue Montreal';
+  src: url('https://cdn.jsdelivr.net/gh/niccoloboanini/fonts@main/PPNeueMontreal-Bold.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
 :root {
-  --background: #0c1117;
-  --foreground: #f0f4f8;
-  --card: #151c25;
-  --card-foreground: #f0f4f8;
-  --popover: #151c25;
-  --popover-foreground: #f0f4f8;
+  --background: #0b0f14;
+  --foreground: #e8ecf1;
+  --card: #12171e;
+  --card-foreground: #e8ecf1;
+  --popover: #12171e;
+  --popover-foreground: #e8ecf1;
   --primary: #3ecf8e;
-  --primary-foreground: #0c1117;
-  --secondary: #1e293b;
-  --secondary-foreground: #e2e8f0;
-  --muted: #1a2332;
-  --muted-foreground: #8b9bb4;
+  --primary-foreground: #0b0f14;
+  --secondary: #181f28;
+  --secondary-foreground: #c4cdd9;
+  --muted: #161c24;
+  --muted-foreground: #6b7a8d;
   --accent: #3ecf8e;
-  --accent-foreground: #0c1117;
+  --accent-foreground: #0b0f14;
   --destructive: #ef4444;
   --destructive-foreground: #ffffff;
-  --border: #1e293b;
-  --input: #1e293b;
+  --border: #1f2937;
+  --input: #1f2937;
   --ring: #3ecf8e;
   --chart-1: #3ecf8e;
   --chart-2: #088395;
   --chart-3: #7AB2B2;
   --chart-4: #0a8a6e;
   --chart-5: #065a6e;
-  --radius: 1rem;
-  --sidebar: #111827;
-  --sidebar-foreground: #f0f4f8;
+  --radius: 0.75rem;
+  --sidebar: #0f1319;
+  --sidebar-foreground: #e8ecf1;
   --sidebar-primary: #3ecf8e;
-  --sidebar-primary-foreground: #0c1117;
-  --sidebar-accent: #1a2332;
-  --sidebar-accent-foreground: #f0f4f8;
-  --sidebar-border: #1e293b;
+  --sidebar-primary-foreground: #0b0f14;
+  --sidebar-accent: #161c24;
+  --sidebar-accent-foreground: #e8ecf1;
+  --sidebar-border: #1f2937;
   --sidebar-ring: #3ecf8e;
 }
 
 @theme inline {
-  --font-sans: 'DM Sans', 'DM Sans Fallback', system-ui, sans-serif;
+  --font-sans: 'Neue Montreal', system-ui, -apple-system, sans-serif;
   --font-mono: 'Geist Mono', 'Geist Mono Fallback', monospace;
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -89,74 +113,11 @@
   }
 }
 
-@keyframes fade-in-up {
-  from {
-    opacity: 0;
-    transform: translateY(24px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
 @keyframes marquee {
-  0% {
-    transform: translateX(0);
-  }
-  100% {
-    transform: translateX(-50%);
-  }
-}
-
-@keyframes pulse-glow {
-  0%, 100% {
-    opacity: 0.4;
-  }
-  50% {
-    opacity: 0.8;
-  }
-}
-
-.animate-fade-in-up {
-  animation: fade-in-up 0.6s ease-out forwards;
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
 }
 
 .animate-marquee {
-  animation: marquee 30s linear infinite;
-}
-
-.animation-delay-100 {
-  animation-delay: 100ms;
-}
-
-.animation-delay-200 {
-  animation-delay: 200ms;
-}
-
-.animation-delay-300 {
-  animation-delay: 300ms;
-}
-
-.animation-delay-400 {
-  animation-delay: 400ms;
-}
-
-.animate-pulse-glow {
-  animation: pulse-glow 3s ease-in-out infinite;
-}
-
-/* Custom scrollbar for dark theme */
-::-webkit-scrollbar {
-  width: 8px;
-}
-::-webkit-scrollbar-track {
-  background: var(--background);
-}
-::-webkit-scrollbar-thumb {
-  background: var(--border);
-  border-radius: 4px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: var(--muted-foreground);
+  animation: marquee 40s linear infinite;
 }

@@ -1,19 +1,15 @@
 import type { Metadata, Viewport } from 'next'
-import { DM_Sans, Geist_Mono } from 'next/font/google'
+import { Geist_Mono } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
 import './globals.css'
 
-const _dmSans = DM_Sans({
-  subsets: ["latin"],
-  variable: "--font-dm-sans",
-});
 const _geistMono = Geist_Mono({
   subsets: ["latin"],
   variable: "--font-geist-mono",
 });
 
 export const metadata: Metadata = {
-  title: 'LivestockAI - AI-Powered Livestock Health Intelligence',
+  title: 'LivestockAI - Livestock Health Intelligence',
   description: 'Detect livestock diseases early with AI-powered analysis. Get instant confidence results, chat with an AI assistant, and book veterinary experts.',
   generator: 'v0.app',
   icons: {
@@ -36,7 +32,7 @@ export const metadata: Metadata = {
 }
 
 export const viewport: Viewport = {
-  themeColor: '#0c1117',
+  themeColor: '#0b0f14',
   width: 'device-width',
   initialScale: 1,
 }
@@ -48,7 +44,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${_dmSans.variable} ${_geistMono.variable} font-sans antialiased`}>
+      <body className={`${_geistMono.variable} font-sans antialiased`}>
         {children}
         <Analytics />
       </body>
