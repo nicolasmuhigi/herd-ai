@@ -4,6 +4,7 @@ import { getTokenFromRequest, verifyToken } from "@/lib/jwt";
 import { analyzeCattleImage } from "@/lib/model-inference";
 import fs from "fs/promises";
 import path from "path";
+import { put } from "@vercel/blob";
 
 const SUPPORTED_DISEASE_TYPES = new Set([
   "HEALTHY",
@@ -21,6 +22,41 @@ async function ensureUploadsDir() {
   } catch (error) {
     console.error("Error creating uploads directory:", error);
   }
+}
+
+function buildUploadFileName(originalName: string): string {
+  const safeName = originalName.replace(/[^a-zA-Z0-9._-]/g, "_");
+  return `${Date.now()}_${safeName}`;
+}
+
+async function saveImageBuffer(options: {
+  filename: string;
+  imageBuffer: Buffer;
+  contentType: string;
+}): Promise<string> {
+  const blobToken = process.env.BLOB_READ_WRITE_TOKEN?.trim();
+
+  if (blobToken) {
+    const blob = await put(`uploads/${options.filename}`, options.imageBuffer, {
+      access: "public",
+      addRandomSuffix: true,
+      contentType: options.contentType,
+      token: blobToken,
+    });
+
+    return blob.url;
+  }
+
+  if (process.env.VERCEL) {
+    throw new Error(
+      "BLOB_READ_WRITE_TOKEN is not configured. Add it in Vercel Environment Variables for production uploads."
+    );
+  }
+
+  await ensureUploadsDir();
+  const filepath = path.join(uploadsDir, options.filename);
+  await fs.writeFile(filepath, options.imageBuffer);
+  return `/uploads/${options.filename}`;
 }
 
 
@@ -289,17 +325,15 @@ export async function POST(req: NextRequest) {
     const buffer = await imageFile.arrayBuffer();
     const imageBuffer = Buffer.from(buffer);
 
-    // Prepare file save and analysis in parallel
-    const filename = `${Date.now()}_${imageFile.name}`;
-    const filepath = path.join(uploadsDir, filename);
-    
-    // Start both file write and image analysis in parallel
-    const [predictions] = await Promise.all([
+    // Save image and run model inference concurrently
+    const filename = buildUploadFileName(imageFile.name);
+    const [predictions, imageUrl] = await Promise.all([
       analyzeCattleImage(imageBuffer, req.nextUrl.origin),
-      (async () => {
-        await ensureUploadsDir();
-        await fs.writeFile(filepath, imageBuffer);
-      })(),
+      saveImageBuffer({
+        filename,
+        imageBuffer,
+        contentType: imageFile.type || "application/octet-stream",
+      }),
     ]);
 
     const dbDiseaseType = SUPPORTED_DISEASE_TYPES.has(predictions.detectedDisease)
@@ -345,7 +379,7 @@ export async function POST(req: NextRequest) {
     const analysis = await prisma.analysis.create({
       data: {
         userId: payload.userId,
-        imageUrl: `/uploads/${filename}`,
+        imageUrl,
         uploadDistrict: effectiveDistrict,
         uploadLatitude: effectiveLatitude,
         uploadLongitude: effectiveLongitude,
