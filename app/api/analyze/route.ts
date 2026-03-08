@@ -46,6 +46,7 @@ async function analyzeCattleImage(
   requestOrigin?: string
 ): Promise<ModelPredictions> {
   const apiErrors: string[] = [];
+  const isProductionRuntime = process.env.NODE_ENV === "production" || Boolean(process.env.RENDER);
 
   for (const apiUrl of MODEL_API_URLS) {
     try {
@@ -82,6 +83,13 @@ async function analyzeCattleImage(
         `${apiUrl} -> ${error instanceof Error ? error.message : "Unknown error"}`
       );
     }
+  }
+
+  if (isProductionRuntime) {
+    const apiMessage = apiErrors.length > 0 ? apiErrors.join(" | ") : "No API endpoints configured";
+    throw new Error(
+      `Failed to analyze image: model API unavailable (${apiMessage}). Set MODEL_API_URL to your backend predict endpoint, e.g. https://livestock-backend.onrender.com/predict`
+    );
   }
 
   try {
