@@ -6,8 +6,6 @@ import io
 import logging
 import os
 from threading import Lock
-import subprocess
-import time
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -24,15 +22,10 @@ app.add_middleware(
 
 MODEL_INPUT_SIZE = 192
 CLASS_LABELS = ["FOOT_AND_MOUTH", "HEALTHY", "LUMPY_SKIN", "MASTITIS"]
-GDRIVE_FILE_ID = "1_h11YQpkq8lQddmpUGh97wGJ0OY5sbCn"
-MODEL_PATH = os.getenv("MODEL_PATH", "/app/cattle_model.keras")
 MODEL_PATH_CANDIDATES = [
-    MODEL_PATH,
     "./cattle_model.keras",
-    "/app/cattle_model.keras",
     "../cattle_model.keras",
-    "/opt/render/project/src/cattle_model.keras",
-    "/opt/render/project/src/huggingface-space/cattle_model.keras",
+    "cattle_model.keras",
 ]
 
 model = None
@@ -48,40 +41,16 @@ def summarize_error(error: Exception, max_len: int = 800) -> str:
     return f"{text[:max_len]}... [truncated]"
 
 
-def download_model_from_drive(file_id: str, dest_path: str, max_retries: int = 3) -> None:
-    """Download model from Google Drive using gdown with retries."""
-    for attempt in range(max_retries):
-        try:
-            logger.info(f"Downloading model from Google Drive (attempt {attempt + 1}/{max_retries})...")
-            import gdown
-            url = f"https://drive.google.com/uc?id={file_id}"
-            gdown.download(url, dest_path, quiet=False)
-            if os.path.exists(dest_path) and os.path.getsize(dest_path) > 0:
-                logger.info(f"Model downloaded successfully to {dest_path}")
-                return
-        except Exception as e:
-            logger.error(f"Attempt {attempt + 1} failed: {e}")
-            if attempt < max_retries - 1:
-                time.sleep(2 ** attempt)  # Exponential backoff
-    raise RuntimeError("Failed to download model from Google Drive after retries")
-
-
 def resolve_model_path() -> str:
-    # Check if model exists in any candidate location
+    """Find the model file from candidate paths."""
     for candidate in MODEL_PATH_CANDIDATES:
         if os.path.exists(candidate):
-            if os.path.getsize(candidate) == 0:
+            size = os.path.getsize(candidate)
+            if size == 0:
                 raise RuntimeError(f"Model file at {candidate} is empty")
-            logger.info("Using model path: %s", candidate)
+            logger.info(f"Using model path: {candidate} ({size / 1e6:.1f} MB)")
             return candidate
-
-    # Model not found; try to download from Google Drive to the first candidate path
-    logger.warning(f"Model not found in any candidate path. Attempting download from Google Drive...")
-    primary_path = MODEL_PATH_CANDIDATES[0]
-    os.makedirs(os.path.dirname(primary_path) or ".", exist_ok=True)
-    download_model_from_drive(GDRIVE_FILE_ID, primary_path)
-    logger.info("Using model path: %s", primary_path)
-    return primary_path
+    raise RuntimeError(f"Model not found. Checked: {', '.join(MODEL_PATH_CANDIDATES)}")
 
 
 def get_model():

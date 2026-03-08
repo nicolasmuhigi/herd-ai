@@ -12,8 +12,9 @@ const SUPPORTED_DISEASE_TYPES = new Set([
   "ANTHRAX",
 ]);
 
-// Hugging Face API configuration
-const HF_API_URL = process.env.HF_MODEL_API_URL || "https://your-space-name.hf.space/predict";
+// Local API configuration
+const LOCAL_API_URL = "http://localhost:8000/predict";
+const HF_API_URL = process.env.HF_MODEL_API_URL || LOCAL_API_URL;
 const HF_API_TOKEN = process.env.HF_API_TOKEN?.trim();
 const HF_MAX_RETRIES = 3;
 const HF_RETRY_BASE_DELAY_MS = 1200;
