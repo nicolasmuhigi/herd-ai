@@ -13,11 +13,7 @@ const SUPPORTED_DISEASE_TYPES = new Set([
 ]);
 
 // Local API configuration
-const LOCAL_API_URL = "http://localhost:8000/predict";
-const HF_API_URL = process.env.HF_MODEL_API_URL || LOCAL_API_URL;
-const HF_API_TOKEN = process.env.HF_API_TOKEN?.trim();
-const HF_MAX_RETRIES = 3;
-const HF_RETRY_BASE_DELAY_MS = 1200;
+const MODEL_API_URL = process.env.MODEL_API_URL || "http://127.0.0.1:8010/predict";
 
 interface ModelPredictions {
   healthy: number;
@@ -32,58 +28,27 @@ interface ModelPredictions {
 
 async function analyzeCattleImage(imageBuffer: Buffer): Promise<ModelPredictions> {
   try {
-    const buildRequestBody = () => {
-      const formData = new FormData();
-      const blob = new Blob([imageBuffer], { type: "image/jpeg" });
-      formData.append("file", blob, "image.jpg");
-      return formData;
-    };
+    const formData = new FormData();
+    const blob = new Blob([imageBuffer], { type: "image/jpeg" });
+    formData.append("file", blob, "image.jpg");
 
-    const headers: HeadersInit = {};
-    if (HF_API_TOKEN) {
-      headers.Authorization = `Bearer ${HF_API_TOKEN}`;
+    const response = await fetch(MODEL_API_URL, {
+      method: "POST",
+      body: formData,
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`API error: ${response.status} ${response.statusText} - ${errorText}`);
     }
 
-    let lastStatus = 0;
-    let lastStatusText = "";
-    let lastErrorBody = "";
+    const result = await response.json();
 
-    // Retry transient HF failures caused by Space cold starts or model warm-up.
-    for (let attempt = 1; attempt <= HF_MAX_RETRIES; attempt += 1) {
-      const response = await fetch(HF_API_URL, {
-        method: "POST",
-        headers,
-        body: buildRequestBody(),
-      });
-
-      if (response.ok) {
-        const result = await response.json();
-
-        if (!result.success || !result.predictions) {
-          throw new Error("Invalid response from model API");
-        }
-
-        return result.predictions;
-      }
-
-      lastStatus = response.status;
-      lastStatusText = response.statusText;
-      lastErrorBody = (await response.text()).slice(0, 300);
-
-      const isRetriable = response.status === 503 || response.status === 502 || response.status === 504;
-      if (!isRetriable || attempt === HF_MAX_RETRIES) {
-        break;
-      }
-
-      const backoff = HF_RETRY_BASE_DELAY_MS * attempt;
-      await new Promise((resolve) => setTimeout(resolve, backoff));
+    if (!result.success || !result.predictions) {
+      throw new Error("Invalid response from model API");
     }
 
-    if (lastErrorBody) {
-      throw new Error(`HF API error: ${lastStatus} ${lastStatusText} - ${lastErrorBody}`);
-    }
-
-    throw new Error(`HF API error: ${lastStatus} ${lastStatusText}`);
+    return result.predictions;
   } catch (error) {
     console.error("Model inference error:", error);
     throw new Error(`Failed to analyze image: ${error instanceof Error ? error.message : "Unknown error"}`);

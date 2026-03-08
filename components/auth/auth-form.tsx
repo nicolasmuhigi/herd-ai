@@ -15,6 +15,7 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
+    district: "",
     password: "",
     role: "USER" as "USER" | "VET",
   })
@@ -42,6 +43,7 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
         : {
             email: formData.email,
             name: formData.name,
+            district: formData.role === "VET" ? formData.district : undefined,
             password: formData.password,
             role: formData.role,
           }
@@ -149,6 +151,23 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
                   value={formData.name}
                   onChange={handleInputChange}
                   required
+                  className="w-full rounded-lg border border-border bg-secondary px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground outline-none transition-all focus:border-primary focus:ring-1 focus:ring-primary/30"
+                />
+              </div>
+            )}
+
+            {!isLogin && formData.role === "VET" && (
+              <div>
+                <label htmlFor="district" className="mb-1.5 block text-sm font-medium text-foreground">
+                  District
+                </label>
+                <input
+                  id="district"
+                  type="text"
+                  placeholder="your district"
+                  value={formData.district}
+                  onChange={handleInputChange}
+                  required={formData.role === "VET"}
                   className="w-full rounded-lg border border-border bg-secondary px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground outline-none transition-all focus:border-primary focus:ring-1 focus:ring-primary/30"
                 />
               </div>

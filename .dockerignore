@@ -1,0 +1,9 @@
+.git
+.gitignore
+.next
+.venv
+node_modules
+public/uploads
+huggingface-space
+**/__pycache__
+**/*.pyc

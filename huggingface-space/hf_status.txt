@@ -1,3 +1,0 @@
-stage=APP_STARTING
-repo_sha=7b283b446c57847361c7a45cf351d3ac26e5d5aa
-runtime_sha=

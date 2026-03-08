@@ -3,7 +3,7 @@ import { z } from "zod";
 export const signUpSchema = z.object({
   email: z.string().email("Invalid email address"),
   name: z.string().min(2, "Name must be at least 2 characters"),
-  district: z.string().min(2).max(120).optional(),
+  district: z.string().trim().min(2).max(120).optional(),
   password: z
     .string()
     .min(8, "Password must be at least 8 characters")
@@ -11,6 +11,14 @@ export const signUpSchema = z.object({
     .regex(/[a-z]/, "Password must contain at least one lowercase letter")
     .regex(/[0-9]/, "Password must contain at least one number"),
   role: z.enum(["USER", "VET"]).default("USER"),
+}).superRefine((data, ctx) => {
+  if (data.role === "VET" && (!data.district || data.district.trim().length < 2)) {
+    ctx.addIssue({
+      path: ["district"],
+      code: z.ZodIssueCode.custom,
+      message: "District is required for veterinarians",
+    });
+  }
 });
 
 export const loginSchema = z.object({

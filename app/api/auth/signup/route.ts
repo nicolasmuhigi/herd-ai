@@ -21,6 +21,7 @@ export async function POST(req: NextRequest) {
     }
 
     const { email, name, district, password, role } = validationResult.data;
+    const normalizedDistrict = role === "VET" ? district?.trim() ?? null : null;
 
     // Check if user already exists
     const existingUser = await prisma.user.findUnique({
@@ -42,7 +43,7 @@ export async function POST(req: NextRequest) {
       data: {
         email,
         name,
-        district: district ?? null,
+        district: normalizedDistrict,
         password: hashedPassword,
         role: role as "USER" | "VET",
       },

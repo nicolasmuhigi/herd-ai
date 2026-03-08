@@ -259,7 +259,7 @@ export default function ResultsPage() {
 
                 <p className="text-sm leading-relaxed text-muted-foreground">{result.advisory}</p>
 
-                {result.confidence >= 50 && (
+                {isTopResult && !result.isHealthy && (
                   <div className="mt-4 flex flex-wrap gap-2">
                     <Link
                       href="/dashboard/assistant"
