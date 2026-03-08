@@ -16,4 +16,3 @@ package-lock.json
 
 # Local ML artifacts (too large for regular git push)
 cattle_model.keras
-huggingface-space/
