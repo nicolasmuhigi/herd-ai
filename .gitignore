@@ -15,4 +15,4 @@ public/uploads/
 package-lock.json
 
 # Local ML artifacts (too large for regular git push)
-cattle_model.keras
+# cattle_model.keras is tracked with Git LFS instead
