@@ -1,267 +1,180 @@
-# [ Herd AI ] A Livestock Health Management Platform
+# Herd AI: Livestock Health Management Platform
 
-> An AI-powered livestock health management system that enables farmers to detect diseases early, connect with veterinarians, and track herd health through advanced analytics.
+AI-powered web platform for livestock disease screening, vet booking, and herd health tracking.
 
+## Demo
+- Video: https://drive.google.com/file/d/1IhiLub_UjQdqkYT8ZwwzWAHMCBRRLrZ3/view?usp=sharing
+- Live app: https://livestock-frontend.onrender.com/
 
-## Demo Video
+## Tech Stack
+- Frontend/API: Next.js App Router (`app/`)
+- Database: PostgreSQL + Prisma (`prisma/`)
+- Auth: JWT (`lib/jwt.ts`)
+- AI chat: Gemini (`app/api/chat/route.ts`)
+- Image analysis: calls model API endpoints from `MODEL_API_URL` / `MODEL_API_URLS`
+- Optional Python model runtime: `scripts/keras_inference.py` + `cattle_model.keras`
 
-[Watch Demo](https://drive.google.com/file/d/1IhiLub_UjQdqkYT8ZwwzWAHMCBRRLrZ3/view?usp=sharing)
-
-
-
-## Live Deployment
-
-[Visit the Deployed Application](https://your-deployed-app-link-here.com)
-
-
-
-## Related Project Files
-
-| File / Folder | Description |
-|---|---|
-| `app/` | Next.js App Router pages and API routes |
-| `components/` | Reusable React UI components |
-| `lib/` | Utilities: auth, JWT, ML inference, email, disease advice |
-| `prisma/schema.prisma` | PostgreSQL database schema |
-| `prisma/migrations/` | Version-controlled database migrations |
-| `public/model/` | TensorFlow.js ML model files (`model.json`, `model.weights.bin`) |
-| `public/uploads/` | Uploaded livestock images (runtime-generated) |
-| `scripts/keras_inference.py` | Optional Python/Keras inference runtime |
-| `.env` | Environment variables (not committed — see setup below) |
-| `package.json` | Project dependencies and scripts |
-
+## Repository Layout
+- `app/`: pages and route handlers
+- `components/`: UI components
+- `lib/`: auth, model inference, email, helpers
+- `backend/`: optional FastAPI services (proxy and local model server)
+- `huggingface-space/`: Dockerized FastAPI model service for HF Spaces
+- `prisma/`: schema and migrations
+- `scripts/`: helper scripts including Python inference bridge
 
 ## Prerequisites
+- Node.js 20+
+- npm 10+
+- PostgreSQL 14+
+- Python 3.10 or 3.11 (optional, only for local Keras inference)
 
-Before you begin, ensure the following are installed on your machine:
+## Local Setup
 
-| Tool | Version | Download |
-|---|---|---|
-| **Node.js** | v18.0.0 or higher | [nodejs.org](https://nodejs.org) |
-| **pnpm** | v8.0.0 or higher | `npm install -g pnpm` |
-| **PostgreSQL** | v14.0 or higher | [postgresql.org](https://www.postgresql.org/download/) |
-| **Git** | Latest | [git-scm.com](https://git-scm.com) |
-| **Python** *(optional)* | v3.10 or v3.11 | [python.org](https://www.python.org) — only needed for Keras runtime |
-
-
-## Installation & Setup (Step by Step)
-
-### Step 1 — Clone the Repository
-
+### 1. Clone and install
 ```bash
-git clone https://github.com/yourusername/herd-ai-platform.git
-cd herd-ai-platform
+git clone <your-repo-url>
+cd livestock-ai-platform
+npm install
 ```
 
-> **Replace the URL above with your actual GitHub repository link.**
-
-
-### Step 2 — Install Node.js Dependencies
-
-```bash
-pnpm install
-```
-
-This installs all frontend and backend packages including Next.js, TensorFlow.js, Prisma, and more.
-
-
-### Step 3 — Configure Environment Variables
-
-Copy the example environment file and fill in your credentials:
-
-```bash
-cp .env.example .env
-```
-
-Then open `.env` and update the following values:
+### 2. Create `.env.local`
+Create `./.env.local` with at least:
 
 ```env
-# ─── Database ───────────────────────────────────────────────────────────────
-DATABASE_URL="postgresql://YOUR_USER:YOUR_PASSWORD@localhost:5432/herd_ai?schema=public"
+DATABASE_URL="postgresql://USER:PASSWORD@localhost:5432/herd_ai?schema=public"
+JWT_SECRET="replace-with-a-long-random-secret"
 
-# ─── JWT Authentication ──────────────────────────────────────────────────────
-JWT_SECRET="your-super-secret-jwt-key-minimum-32-characters"
+# Model API endpoint(s) used by app/api/analyze/route.ts
+# Single endpoint:
+MODEL_API_URL="http://127.0.0.1:7860/predict"
+# Or comma-separated endpoints:
+# MODEL_API_URLS="http://127.0.0.1:7860/predict,http://127.0.0.1:8010/predict"
 
-# ─── Google Gemini AI (Chat Assistant) ──────────────────────────────────────
-GEMINI_API_KEY="AIzaSyXXXXXXXXXXXXXXXXXXXXXXXXXXX"
-
-# ─── Email Notifications (SMTP) ──────────────────────────────────────────────
-EMAIL_HOST="smtp.gmail.com"
-EMAIL_PORT="587"
-EMAIL_USER="your-email@gmail.com"
-EMAIL_PASSWORD="your-gmail-app-specific-password"
-
-# ─── ML Model Runtime (optional) ─────────────────────────────────────────────
-MODEL_RUNTIME="auto"        # Options: "tfjs", "keras", "auto"
-MODEL_PATH="./cattle_model.keras"  # Only required if using Keras runtime
-
-# ─── Next.js ─────────────────────────────────────────────────────────────────
-NODE_ENV="development"
-NEXT_PUBLIC_APP_URL="http://localhost:3000"
+# Optional features
+GEMINI_API_KEY=""
+GEMINI_MODEL="gemini-2.5-flash"
+EMAIL_USER=""
+EMAIL_PASSWORD=""
+EMAIL_FROM=""
 ```
 
->  **Gmail tip:** Use an [App Password](https://support.google.com/accounts/answer/185833) instead of your regular password. Enable 2FA on your Google account first.
+Notes:
+- The app reads `GEMINI_API_KEY` from `.env.local` in the chat route.
+- If `BLOB_READ_WRITE_TOKEN` is unset, uploads are stored in `public/uploads/` for local development.
 
->  **Gemini API Key:** Get a free key at [Google AI Studio](https://makersuite.google.com/app/apikey).
-
-
-### Step 4 — Set Up the PostgreSQL Database
-
-First, create a new database in PostgreSQL:
-
+### 3. Set up database
 ```bash
-# Connect to PostgreSQL
-psql -U postgres
-
-# Inside psql shell, create the database
-CREATE DATABASE herd_ai;
-\q
+npx prisma generate
+npx prisma migrate dev
 ```
 
-Then run Prisma migrations to create all tables:
-
+### 4. Run the app
 ```bash
-pnpm prisma generate
-pnpm prisma migrate dev
+npm run dev
 ```
 
-> This creates all required tables: `User`, `Analysis`, and `Appointment`.
+Open `http://localhost:3000`.
 
+## Model Inference Options
 
-### Step 5 — Add the ML Model Files
+The analysis route (`app/api/analyze/route.ts`) tries external model API endpoints first.
 
-Place your TensorFlow.js model files inside the `public/model/` directory:
-
-```
-public/
-└── model/
-    ├── model.json
-    └── model.weights.bin
+### Option A: Use Hugging Face Space (recommended)
+Set:
+```env
+MODEL_API_URL="https://<your-space>.hf.space/predict"
 ```
 
-> If you are using the Keras runtime instead, place `cattle_model.keras` in the project root and set `MODEL_RUNTIME="keras"` in your `.env` file.
-
-
-### Step 6 — Start the Development Server
-
+### Option B: Use local proxy backend (`backend/app_proxy.py`)
+1. Start proxy:
 ```bash
-pnpm dev
+cd backend
+pip install -r requirements_proxy.txt
+# PowerShell:
+$env:HF_SPACE_URL="https://<your-space>.hf.space/predict"
+# Bash:
+# export HF_SPACE_URL="https://<your-space>.hf.space/predict"
+uvicorn app_proxy:app --host 0.0.0.0 --port 8010
+```
+2. Point Next.js to proxy:
+```env
+MODEL_API_URL="http://127.0.0.1:8010/predict"
 ```
 
-The application will be running at:
+### Option C: Local Keras fallback (development only)
+If model API endpoints are unavailable and app is not in production mode, the app can fall back to local inference (`lib/model-inference.ts`) using:
+- `cattle_model.keras` in repo root, or
+- `KERAS_MODEL_PATH` env var.
 
-```
-http://localhost:3000
-```
-
-
-### Step 7 — (Optional) Set Up Python / Keras Runtime
-
-If you want to use the Keras inference backend instead of TensorFlow.js:
-
+Python deps for fallback:
 ```bash
-# Install Python dependencies
 pip install tensorflow pillow numpy
-
-# Confirm the script runs correctly
-python scripts/keras_inference.py
 ```
 
-Set `MODEL_RUNTIME="keras"` in your `.env` file to activate it.
-
-
-## Build for Production
-
-```bash
-# Create optimised production build
-pnpm build
-
-# Start production server
-pnpm start
+Optional env vars for local fallback:
+```env
+MODEL_RUNTIME="auto"          # auto | keras | tfjs
+KERAS_MODEL_PATH="./cattle_model.keras"
+KERAS_PYTHON_BIN="python"
+TFJS_MODEL_PATH=""            # if using tfjs model.json instead
 ```
 
-### Deploy to Vercel (Recommended)
+## Production Deployment (Render)
 
+This repo includes `render.yaml` for blueprint deployment:
+- `livestock-frontend` (Next.js)
+- `livestock-backend` (FastAPI proxy)
+- managed PostgreSQL database
+
+Quick flow:
+1. Push repo (with model handling strategy in place).
+2. Create Blueprint on Render from `render.yaml`.
+3. Set required env vars:
+   - Frontend: `DATABASE_URL`, `NEXTAUTH_URL`, `JWT_SECRET`, `MODEL_API_URL` or `MODEL_API_URLS`, optional `GEMINI_API_KEY`
+   - Backend proxy: `HF_SPACE_URL`
+4. Deploy and verify:
+   - Frontend health: `/api/health`
+   - Backend health: `/health`
+
+Detailed instructions: `RENDER_DEPLOYMENT.md`
+
+## API Quick Checks
+
+### Health
 ```bash
-npm install -g vercel
-vercel
+curl http://localhost:3000/api/health
 ```
 
-Follow the CLI prompts and add all environment variables in the Vercel dashboard under **Project → Settings → Environment Variables**.
-
-
-## Quick API Tests
-
-Once the server is running, you can verify the API with these curl commands:
-
+### Auth signup
 ```bash
-# Create a new account
 curl -X POST http://localhost:3000/api/auth/signup \
   -H "Content-Type: application/json" \
   -d '{"name":"Test Farmer","email":"test@farm.com","password":"password123","district":"Kampala"}'
-
-# Log in
-curl -X POST http://localhost:3000/api/auth/login \
-  -H "Content-Type: application/json" \
-  -d '{"email":"test@farm.com","password":"password123"}'
 ```
 
-
-## Key Application Routes
-
-| Route | Description |
-|---|---|
-| `/` | Landing page with features and analytics |
-| `/signup` | Create a new farmer or vet account |
-| `/login` | Sign in to your account |
-| `/dashboard` | Farmer dashboard — upload image for analysis |
-| `/dashboard/results` | View AI analysis results and history |
-| `/dashboard/assistant` | Chat with Gemini AI health assistant |
-| `/dashboard/booking` | Book a vet appointment |
-| `/vet-dashboard` | Veterinarian dashboard with disease hotspot map |
-| `/vet-dashboard/appointments` | Manage pending appointments |
-| `/vet-dashboard/history` | View history and export PDF reports |
-
-
-## User Roles
-
-| Role | How to Set | Access |
-|---|---|---|
-| **USER** (Farmer) | Default on signup | Dashboard, analysis, booking, chat |
-| **VET** (Veterinarian) | Set `role: "VET"` in database or signup form | Vet dashboard, appointments, PDF reports |
-
+## Common Issues
+- `Failed to analyze image: model API unavailable`:
+  - Set `MODEL_API_URL` or `MODEL_API_URLS` to a reachable `/predict` endpoint.
+- Prisma connection errors:
+  - Verify `DATABASE_URL`, then run `npx prisma generate` and `npx prisma migrate dev`.
+- Gemini chat errors:
+  - Ensure `GEMINI_API_KEY` is valid in `.env.local`.
+- Upload failures on Vercel:
+  - Set `BLOB_READ_WRITE_TOKEN`.
 
 ## Useful Commands
-
 ```bash
-pnpm dev              # Start development server
-pnpm build            # Build for production
-pnpm start            # Run production server
-pnpm lint             # Lint and check code quality
-pnpm prisma studio    # Open visual database browser (GUI)
-pnpm prisma migrate dev --name <migration_name>   # Create a new migration
+npm run dev
+npm run build
+npm run start
+npm run lint
+npx prisma generate
+npx prisma migrate dev
 ```
 
-
-## Troubleshooting
-
-| Problem | Solution |
-|---|---|
-| `DATABASE_URL` connection error | Verify PostgreSQL is running and credentials are correct |
-| `prisma generate` fails | Ensure Node.js v18+ is installed and run `pnpm install` again |
-| ML model not loading | Confirm `model.json` and `model.weights.bin` exist in `public/model/` |
-| Gemini chat not working | Check `GEMINI_API_KEY` is valid and has not exceeded quota |
-| Emails not sending | Use a Gmail App Password, not your regular Gmail password |
-| Port 3000 already in use | Run `pnpm dev -- -p 3001` to use a different port |
-
-
-
-
 ## Contributing
-
-1. Fork this repository
-2. Create a feature branch: `git checkout -b feature/your-feature`
-3. Commit your changes: `git commit -m 'Add your feature'`
-4. Push to the branch: `git push origin feature/your-feature`
-5. Open a Pull Request
+1. Create a branch: `git checkout -b feature/<name>`
+2. Commit: `git commit -m "feat: <summary>"`
+3. Push and open a PR
 
