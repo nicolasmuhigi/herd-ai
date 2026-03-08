@@ -30,6 +30,18 @@ if not HF_SPACE_URL:
 DEFAULT_CLASS_LABELS = ["FOOT_AND_MOUTH", "HEALTHY", "LUMPY_SKIN", "MASTITIS"]
 
 
+def get_hf_base_url(url: str) -> str:
+    normalized = url.strip().rstrip("/")
+    if normalized.endswith("/predict"):
+        return normalized[:-len("/predict")]
+    return normalized
+
+
+def get_hf_predict_url(url: str) -> str:
+    base = get_hf_base_url(url)
+    return f"{base}/predict"
+
+
 @app.get("/")
 async def root():
     return {
@@ -54,8 +66,8 @@ async def health_check():
     # Try to ping the HF Space if configured
     if HF_SPACE_URL:
         try:
-            async with httpx.AsyncClient(timeout=10.0) as client:
-                hf_health_url = f"{HF_SPACE_URL.rstrip('/predict')}/health"
+            async with httpx.AsyncClient(timeout=httpx.Timeout(20.0, connect=10.0)) as client:
+                hf_health_url = f"{get_hf_base_url(HF_SPACE_URL)}/health"
                 response = await client.get(hf_health_url)
                 if response.status_code == 200:
                     hf_status = response.json()
@@ -92,11 +104,13 @@ async def predict(file: UploadFile = File(...)):
         logger.info(f"Forwarding prediction request to HF Space: {file.filename}")
         
         # Forward to Hugging Face Space
-        async with httpx.AsyncClient(timeout=30.0) as client:
+        # First call can be slow because HF Space may need to wake and load model.
+        timeout = httpx.Timeout(240.0, connect=20.0)
+        async with httpx.AsyncClient(timeout=timeout) as client:
             files = {"file": (file.filename, image_bytes, file.content_type or "image/jpeg")}
             
             # Make request to HF Space
-            hf_url = HF_SPACE_URL if HF_SPACE_URL.endswith('/predict') else f"{HF_SPACE_URL}/predict"
+            hf_url = get_hf_predict_url(HF_SPACE_URL)
             response = await client.post(hf_url, files=files)
             
             # Check response
