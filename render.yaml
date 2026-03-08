@@ -1,10 +1,4 @@
 services:
-  # PostgreSQL Database
-  - type: pserv
-    name: livestock-db
-    env: docker
-    plan: free
-
   # FastAPI Backend (Python ML Service)
   - type: web
     name: livestock-backend
