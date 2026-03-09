@@ -312,13 +312,10 @@ function pickDistrict(address?: Record<string, string | undefined>): string | nu
 function formatAddressFromParts(address?: Record<string, string | undefined>): string {
   if (!address) return "Address not available";
 
+  // For Rwanda, prioritize: road + city (clean format like "KN 5 Rd, Kigali")
   const parts = [
     address.road,
-    address.neighbourhood,
-    address.suburb,
-    address.city_district,
-    address.city || address.town || address.village,
-    address.state,
+    address.city || address.town || address.municipality,
   ]
     .map((part) => part?.trim())
     .filter((part): part is string => Boolean(part));
@@ -405,9 +402,10 @@ async function resolveAddressFromCoordinates(
         "User-Agent": "HerdAI/1.0 (address-resolution)",
       },
       cache: "no-store",
-    }, 10000);
+    }, 15000);
 
     if (!response.ok) {
+      console.log(`✗ Address resolution HTTP ${response.status}`);
       return "Address not available";
     }
 
@@ -416,13 +414,25 @@ async function resolveAddressFromCoordinates(
       address?: Record<string, string | undefined>;
     };
 
+    // Try structured address first (road + city format)
     const fromParts = formatAddressFromParts(payload.address);
     if (fromParts !== "Address not available") {
+      console.log(`✓ Resolved clinic address: ${fromParts}`);
       return fromParts;
     }
 
+    // Fallback to display_name, but clean it up
     const displayName = payload.display_name?.trim();
-    return displayName && displayName.length > 0 ? displayName : "Address not available";
+    if (displayName && displayName.length > 0) {
+      // Take first 2-3 parts of display_name (usually road, area, city)
+      const parts = displayName.split(",").map((p) => p.trim()).slice(0, 3);
+      const cleaned = parts.join(", ");
+      console.log(`✓ Using display_name for clinic: ${cleaned}`);
+      return cleaned;
+    }
+
+    console.log(`✗ No usable address found from Nominatim`);
+    return "Address not available";
   } catch (error) {
     console.error(`✗ Failed to resolve address:`, error);
     return "Address not available";
