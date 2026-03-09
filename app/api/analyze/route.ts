@@ -213,13 +213,17 @@ function haversineKm(lat1: number, lon1: number, lat2: number, lon2: number): nu
 
 function pickDistrict(address?: Record<string, string | undefined>): string | null {
   if (!address) return null;
+  // For Rwanda: prioritize state (province), then city_district, then county, etc.
+  // Rwanda's top-level administrative divisions are provinces/states
   const candidate =
+    address.state ||
     address.city_district ||
     address.state_district ||
     address.county ||
     address.municipality ||
     address.city ||
-    address.town;
+    address.town ||
+    address.administrative;
 
   if (!candidate) return null;
   const normalized = candidate.trim();
@@ -276,7 +280,7 @@ async function resolveDistrictFromCoordinates(
         "User-Agent": "HerdAI/1.0 (district-resolution)",
       },
       cache: "no-store",
-    }, 7000);
+    }, 10000);
 
     if (!response.ok) {
       return null;
@@ -285,8 +289,15 @@ async function resolveDistrictFromCoordinates(
     const payload = (await response.json()) as {
       address?: Record<string, string | undefined>;
     };
-    return pickDistrict(payload.address);
-  } catch {
+    
+    const district = pickDistrict(payload.address);
+    if (district) {
+      console.log(`✓ Resolved district from coordinates: ${district} (address keys: ${Object.keys(payload.address || {}).join(", ")})`);
+    }
+    
+    return district;
+  } catch (error) {
+    console.error(`✗ Failed to resolve district:`, error);
     return null;
   }
 }
@@ -303,7 +314,7 @@ async function resolveAddressFromCoordinates(
         "User-Agent": "HerdAI/1.0 (address-resolution)",
       },
       cache: "no-store",
-    }, 7000);
+    }, 10000);
 
     if (!response.ok) {
       return "Address not available";
@@ -321,7 +332,8 @@ async function resolveAddressFromCoordinates(
 
     const displayName = payload.display_name?.trim();
     return displayName && displayName.length > 0 ? displayName : "Address not available";
-  } catch {
+  } catch (error) {
+    console.error(`✗ Failed to resolve address:`, error);
     return "Address not available";
   }
 }
