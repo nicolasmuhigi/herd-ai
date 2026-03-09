@@ -84,14 +84,32 @@ async function analyzeCattleImage(
       const result = (await response.json()) as {
         success?: boolean;
         predictions?: ModelPredictions;
+        prediction?: string;
+        confidence?: number;
+        probabilities?: Record<string, number>;
       };
 
-      if (!result.success || !result.predictions) {
-        apiErrors.push(`${apiUrl} -> invalid response payload`);
-        continue;
+      if (result.success && result.predictions) {
+        return result.predictions;
       }
 
-      return result.predictions;
+      // Support direct HF Space response shape: { success, prediction, confidence, probabilities }
+      if (result.success && result.probabilities && result.prediction) {
+        const classScores = result.probabilities;
+        return {
+          healthy: classScores.HEALTHY ?? 0,
+          footAndMouth: classScores.FOOT_AND_MOUTH ?? 0,
+          lumpySkin: classScores.LUMPY_SKIN ?? 0,
+          anthrax: classScores.ANTHRAX ?? classScores.MASTITIS ?? 0,
+          classLabels: Object.keys(classScores),
+          classScores,
+          detectedDisease: result.prediction,
+          confidence: Number(result.confidence ?? 0),
+        };
+      }
+
+      apiErrors.push(`${apiUrl} -> invalid response payload`);
+      continue;
     } catch (error) {
       apiErrors.push(
         `${apiUrl} -> ${error instanceof Error ? error.message : "Unknown error"}`

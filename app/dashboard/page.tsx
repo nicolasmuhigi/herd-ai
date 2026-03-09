@@ -16,6 +16,22 @@ interface GeoCoordinates {
   longitude: number
 }
 
+function fileToDataUrl(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    reader.onload = () => {
+      const value = reader.result
+      if (typeof value === "string") {
+        resolve(value)
+      } else {
+        reject(new Error("Failed to read image preview"))
+      }
+    }
+    reader.onerror = () => reject(new Error("Failed to read image preview"))
+    reader.readAsDataURL(file)
+  })
+}
+
 function getCurrentCoordinates(): Promise<GeoCoordinates | null> {
   return new Promise((resolve) => {
     if (typeof window === "undefined" || !navigator.geolocation) {
@@ -133,8 +149,9 @@ export default function UploadPage() {
         throw new Error(parsed.errorMessage || "Invalid analysis response")
       }
 
+      const previewDataUrl = await fileToDataUrl(files[0].file)
       localStorage.setItem("latestAnalysis", JSON.stringify(parsed.data.analysis))
-      localStorage.setItem("latestUploadedPreview", files[0].previewUrl)
+      localStorage.setItem("latestUploadedPreview", previewDataUrl)
       toast.success("Image analyzed successfully")
       router.push("/dashboard/results")
     } catch (error) {

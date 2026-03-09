@@ -145,7 +145,11 @@ export default function ResultsPage() {
     })
     .sort((a, b) => b.confidence - a.confidence)
 
-  const displayImage = analysis?.imageUrl || uploadedPreview
+  const displayImage = analysis?.imageUrl
+    ? analysis.imageUrl.startsWith("http")
+      ? analysis.imageUrl
+      : `${window.location.origin}${analysis.imageUrl}`
+    : uploadedPreview
   const topResult = results.length > 0 ? results[0] : null
   const topConfidence = topResult?.confidence ?? 0
   const isTopHealthy = topResult?.isHealthy ?? false
