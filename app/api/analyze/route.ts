@@ -247,6 +247,23 @@ function formatAddressFromParts(address?: Record<string, string | undefined>): s
   return parts.join(", ");
 }
 
+async function fetchWithTimeout(url: string, init: RequestInit, timeoutMs: number): Promise<Response> {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    return await fetch(url, {
+      ...init,
+      signal: controller.signal,
+    });
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+
+function buildCoordinateLabel(latitude: number, longitude: number): string {
+  return `Near ${latitude.toFixed(4)}, ${longitude.toFixed(4)}`;
+}
+
 async function resolveDistrictFromCoordinates(
   latitude: number,
   longitude: number
@@ -254,12 +271,12 @@ async function resolveDistrictFromCoordinates(
   try {
     const reverseUrl =
       `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${latitude}&lon=${longitude}&zoom=10&addressdetails=1`;
-    const response = await fetch(reverseUrl, {
+    const response = await fetchWithTimeout(reverseUrl, {
       headers: {
         "User-Agent": "HerdAI/1.0 (district-resolution)",
       },
       cache: "no-store",
-    });
+    }, 7000);
 
     if (!response.ok) {
       return null;
@@ -281,12 +298,12 @@ async function resolveAddressFromCoordinates(
   try {
     const reverseUrl =
       `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${latitude}&lon=${longitude}&zoom=18&addressdetails=1`;
-    const response = await fetch(reverseUrl, {
+    const response = await fetchWithTimeout(reverseUrl, {
       headers: {
         "User-Agent": "HerdAI/1.0 (address-resolution)",
       },
       cache: "no-store",
-    });
+    }, 7000);
 
     if (!response.ok) {
       return "Address not available";
@@ -334,13 +351,13 @@ async function findNearestVeterinaryClinic(options: {
 );
 out body geom;`;
 
-    const response = await fetch("https://overpass-api.de/api/interpreter", {
+    const response = await fetchWithTimeout("https://overpass-api.de/api/interpreter", {
       method: "POST",
       body: query,
       headers: {
         "Content-Type": "application/osm3s",
       },
-    });
+    }, 8000);
 
     if (!response.ok) {
       return null;
@@ -394,9 +411,13 @@ out body geom;`;
     );
 
     const nearest = clinics[0];
-    const nearestAddress = nearest.address.trim().length
+    const resolvedAddress = nearest.address.trim().length
       ? nearest.address
       : await resolveAddressFromCoordinates(nearest.lat, nearest.lon);
+    const nearestAddress =
+      resolvedAddress !== "Address not available"
+        ? resolvedAddress
+        : buildCoordinateLabel(nearest.lat, nearest.lon);
 
     return {
       name: nearest.name,
@@ -488,9 +509,13 @@ export async function POST(req: NextRequest) {
       }),
     ]);
 
-    const effectiveDistrict = resolvedDistrict || currentUser?.district || null;
     const effectiveLatitude = latitude ?? currentUser?.latitude ?? null;
     const effectiveLongitude = longitude ?? currentUser?.longitude ?? null;
+    const coordinateDistrict =
+      effectiveLatitude !== null && effectiveLongitude !== null
+        ? buildCoordinateLabel(effectiveLatitude, effectiveLongitude)
+        : null;
+    const effectiveDistrict = resolvedDistrict || currentUser?.district || coordinateDistrict;
 
     if (resolvedDistrict || latitude !== null || longitude !== null) {
       await prisma.user.update({
