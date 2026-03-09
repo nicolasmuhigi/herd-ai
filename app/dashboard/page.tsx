@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useCallback, useRef, useEffect } from "react"
+import { useState, useCallback, useRef } from "react"
 import { useRouter } from "next/navigation"
 import { Upload, ImageIcon, X, Loader2, CheckCircle2 } from "lucide-react"
 import { toast } from "sonner"
@@ -62,12 +62,6 @@ export default function UploadPage() {
   const [files, setFiles] = useState<UploadItem[]>([])
   const [isDragging, setIsDragging] = useState(false)
   const [isAnalyzing, setIsAnalyzing] = useState(false)
-
-  useEffect(() => {
-    return () => {
-      files.forEach((item) => URL.revokeObjectURL(item.previewUrl))
-    }
-  }, [files])
 
   const appendFiles = useCallback((incomingFiles: File[]) => {
     const uploadItems = incomingFiles.map((file) => ({
@@ -149,9 +143,16 @@ export default function UploadPage() {
         throw new Error(parsed.errorMessage || "Invalid analysis response")
       }
 
-      const previewDataUrl = await fileToDataUrl(files[0].file)
       localStorage.setItem("latestAnalysis", JSON.stringify(parsed.data.analysis))
-      localStorage.setItem("latestUploadedPreview", previewDataUrl)
+
+      try {
+        const previewDataUrl = await fileToDataUrl(files[0].file)
+        localStorage.setItem("latestUploadedPreview", previewDataUrl)
+      } catch {
+        // Fallback to object URL if data URL storage fails (e.g., quota limits).
+        localStorage.setItem("latestUploadedPreview", files[0].previewUrl)
+      }
+
       toast.success("Image analyzed successfully")
       router.push("/dashboard/results")
     } catch (error) {

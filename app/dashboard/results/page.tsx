@@ -145,11 +145,14 @@ export default function ResultsPage() {
     })
     .sort((a, b) => b.confidence - a.confidence)
 
-  const displayImage = analysis?.imageUrl
+  const normalizedAnalysisImage = analysis?.imageUrl
     ? analysis.imageUrl.startsWith("http")
       ? analysis.imageUrl
       : `${window.location.origin}${analysis.imageUrl}`
-    : uploadedPreview
+    : null
+
+  // Prefer user's local preview first so results page always shows what was uploaded.
+  const displayImage = uploadedPreview || normalizedAnalysisImage
   const topResult = results.length > 0 ? results[0] : null
   const topConfidence = topResult?.confidence ?? 0
   const isTopHealthy = topResult?.isHealthy ?? false
