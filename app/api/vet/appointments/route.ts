@@ -51,29 +51,49 @@ export async function GET(req: NextRequest) {
     });
 
     // Backfill analysis for older appointments that were created before analysisId existed.
-    const appointmentsWithFallbackAnalysis = await Promise.all(
+    const fs = require('fs');
+    const path = require('path');
+    const uploadsDir = path.join(process.cwd(), 'uploads');
+
+    const appointmentsWithDiagnostics = await Promise.all(
       appointments.map(async (appointment) => {
-        if (appointment.analysis) {
-          return appointment;
+        let analysis = appointment.analysis;
+        if (!analysis) {
+          analysis = await prisma.analysis.findFirst({
+            where: { userId: appointment.userId },
+            orderBy: { createdAt: "desc" },
+          });
         }
 
-        const latestAnalysis = await prisma.analysis.findFirst({
-          where: { userId: appointment.userId },
-          orderBy: { createdAt: "desc" },
-        });
+        let imageUrl = analysis?.imageUrl || null;
+        let imageExists = false;
+        if (imageUrl && imageUrl.startsWith('/uploads/')) {
+          const filePath = path.join(uploadsDir, imageUrl.replace(/^\/uploads\//, ''));
+          try {
+            imageExists = fs.existsSync(filePath);
+          } catch (e) {
+            imageExists = false;
+          }
+        }
 
         return {
           ...appointment,
-          analysis: latestAnalysis,
+          analysis: analysis
+            ? {
+                ...analysis,
+                imageDiagnostics: {
+                  imageUrl,
+                  imageExists,
+                },
+              }
+            : null,
         };
       })
     );
 
-    console.log("Returning appointments with linked analysis:", appointmentsWithFallbackAnalysis);
-
     return NextResponse.json({
       success: true,
-      appointments: appointmentsWithFallbackAnalysis,
+      appointments: appointmentsWithDiagnostics,
     });
   } catch (error) {
     console.error("Failed to fetch vet appointments:", error);

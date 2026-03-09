@@ -66,6 +66,7 @@ export async function POST(req: NextRequest) {
     });
 
     let emailNotificationSent = false;
+    let emailErrorMessage = null;
 
     // Send email notification to vet if email provided
     if (vetId) {
@@ -99,6 +100,7 @@ export async function POST(req: NextRequest) {
         }
       } catch (emailError) {
         console.error("Failed to send vet notification email:", emailError);
+        emailErrorMessage = emailError instanceof Error ? emailError.message : String(emailError);
         // Don't fail the appointment creation if email fails
       }
     }
@@ -114,6 +116,7 @@ export async function POST(req: NextRequest) {
           createdAt: appointment.createdAt,
         },
         emailNotificationSent,
+        emailErrorMessage,
         message: vetId ? "Appointment request sent to veterinarian" : "Appointment created successfully",
       },
       { status: 201 }
