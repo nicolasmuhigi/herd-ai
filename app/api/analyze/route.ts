@@ -450,19 +450,21 @@ async function findNearestVeterinaryClinic(options: {
   }
 
   try {
-    // Approximate bbox from point (±0.045 degrees ≈ 5km)
-    const latMin = options.latitude - 0.045;
-    const latMax = options.latitude + 0.045;
-    const lonMin = options.longitude - 0.045;
-    const lonMax = options.longitude + 0.045;
+    // Expanded bbox from point (±0.15 degrees ≈ 15-17km) for better coverage
+    const latMin = options.latitude - 0.15;
+    const latMax = options.latitude + 0.15;
+    const lonMin = options.longitude - 0.15;
+    const lonMax = options.longitude + 0.15;
 
     // Overpass API query for veterinary clinics
-    const query = `[out:json];
+    const query = `[out:json][timeout:20];
 (
   node["amenity"="veterinary"](${latMin},${lonMin},${latMax},${lonMax});
   way["amenity"="veterinary"](${latMin},${lonMin},${latMax},${lonMax});
 );
 out body geom;`;
+
+    console.log(`🔍 Searching for veterinary clinics near (${options.latitude}, ${options.longitude})`);
 
     const response = await fetchWithTimeout("https://overpass-api.de/api/interpreter", {
       method: "POST",
@@ -470,9 +472,10 @@ out body geom;`;
       headers: {
         "Content-Type": "application/osm3s",
       },
-    }, 8000);
+    }, 12000);
 
     if (!response.ok) {
+      console.log(`✗ Overpass API returned HTTP ${response.status}`);
       return null;
     }
 
@@ -487,8 +490,11 @@ out body geom;`;
     };
 
     if (!data.elements || data.elements.length === 0) {
+      console.log(`✗ No veterinary clinics found within ~15km radius`);
       return null;
     }
+
+    console.log(`✓ Found ${data.elements.length} veterinary clinic(s) nearby`);
 
     // Parse and extract clinic details
     const clinics = data.elements
@@ -551,7 +557,8 @@ out body geom;`;
         haversineKm(options.latitude, options.longitude, nearest.lat, nearest.lon).toFixed(1)
       ),
     };
-  } catch {
+  } catch (error) {
+    console.error(`✗ Failed to find veterinary clinic:`, error);
     return null;
   }
 }
