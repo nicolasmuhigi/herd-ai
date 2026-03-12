@@ -1,6 +1,6 @@
-import dynamic from "next/dynamic"
+"use client"
 
-const AnalysesHistorySection = dynamic(() => import("./../analyses-history"), { ssr: false })
+import AnalysesHistorySection from "../analyses-history"
 
 export default function AnalysesHistoryPage() {
   return (
