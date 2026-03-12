@@ -184,10 +184,26 @@ async function saveImageBuffer(options: {
     body: formData,
   });
 
-  if (!response.ok) {
-    const errorText = await response.text();
-    throw new Error(`Failed to upload to Hugging Face: ${response.status} ${errorText}`);
+  let responseBody;
+  try {
+    responseBody = await response.json();
+  } catch (e) {
+    responseBody = { error: "Failed to parse response as JSON" };
   }
+
+  if (!response.ok) {
+    console.error("Failed to upload to Hugging Face:", response.status, responseBody);
+    throw new Error(`Failed to upload to Hugging Face: ${response.status} ${JSON.stringify(responseBody)}`);
+  }
+
+  // Log the full response for debugging
+  console.log("Hugging Face upload response:", JSON.stringify(responseBody, null, 2));
+
+  // Warn if the file is not in main branch (PR created instead)
+  if (responseBody && responseBody.url && responseBody.url.includes("/tree/")) {
+    console.warn("Image was uploaded to a PR/branch, not main. You must merge the PR in the Hugging Face UI for the image to appear in main.");
+  }
+
   // The public URL for the uploaded file
   // Format: https://huggingface.co/datasets/{dataset}/resolve/main/images/{filename}
   return `https://huggingface.co/datasets/${hfDataset}/resolve/main/images/${options.filename}`;
