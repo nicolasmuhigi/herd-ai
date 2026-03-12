@@ -18,6 +18,7 @@ export default function VetDashboardLayout({ children }: { children: ReactNode }
 
   const isAppointmentsActive = pathname === "/vet-dashboard/appointments"
   const isHistoryActive = pathname.includes("/vet-dashboard/history")
+  const isAnalysesActive = pathname.includes("/vet-dashboard/analyses-history")
   const isDashboardActive = pathname === "/vet-dashboard"
 
   return (
@@ -73,13 +74,24 @@ export default function VetDashboardLayout({ children }: { children: ReactNode }
               <Link
                 href="/vet-dashboard/history"
                 className={`flex items-center gap-2 px-4 py-3 text-sm font-semibold border-b-2 transition-colors ${
-                  isHistoryActive
+                  isHistoryActive && !isAnalysesActive
                     ? "border-primary text-primary"
                     : "border-transparent text-muted-foreground hover:text-foreground"
                 }`}
               >
                 <History className="h-4 w-4" />
                 Appointment History
+              </Link>
+              <Link
+                href="/vet-dashboard/analyses-history"
+                className={`flex items-center gap-2 px-4 py-3 text-sm font-semibold border-b-2 transition-colors ${
+                  isAnalysesActive
+                    ? "border-primary text-primary"
+                    : "border-transparent text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                <History className="h-4 w-4" />
+                Analyses History
               </Link>
             </nav>
           </div>
