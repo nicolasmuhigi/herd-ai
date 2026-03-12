@@ -412,7 +412,7 @@ export default function AppointmentHistoryPage() {
             {apt.analysis?.imageUrl && (
               <div className="rounded-lg overflow-hidden border border-border">
                 <img 
-                  src={apt.analysis.imageUrl} 
+                  src={resolveImageUrl(apt.analysis.imageUrl)} 
                   alt="Cattle analysis image"
                   className="w-full h-48 object-cover"
                 />

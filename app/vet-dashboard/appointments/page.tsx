@@ -28,19 +28,20 @@ interface Appointment {
 }
 
 function resolveImageUrl(imageUrl: string): string {
-  if (!imageUrl) return ""
-  // If already normalized to /api/uploads/, return as is
-  if (imageUrl.startsWith("/api/uploads/")) {
-    return imageUrl
+  if (!imageUrl) return "";
+  // If already a full URL (Hugging Face or http), return as-is
+  if (imageUrl.startsWith("http")) {
+    return imageUrl;
   }
-  // If starts with /uploads/, normalize to /api/uploads/
+  // Only prepend /api/uploads/ for local uploads
   if (imageUrl.startsWith("/uploads/")) {
-    return `/api/uploads/${imageUrl.replace(/^\/uploads\//, "")}`
+    return `/api/uploads/${imageUrl.replace(/^\/uploads\//, "")}`;
   }
-  if (/^https?:\/\//i.test(imageUrl)) return imageUrl
-  if (typeof window === "undefined") return imageUrl
-  if (imageUrl.startsWith("/")) return `${window.location.origin}${imageUrl}`
-  return `${window.location.origin}/${imageUrl}`
+  // If it's a bare filename, assume it's Hugging Face (should not happen after migration, but fallback)
+  if (!imageUrl.startsWith("/")) {
+    return `https://huggingface.co/datasets/NickMuhigi/livestock-disease-detector/resolve/main/images/${imageUrl}`;
+  }
+  return imageUrl;
 }
 
 export default function VetAppointmentsPage() {

@@ -164,29 +164,33 @@ async function saveImageBuffer(options: {
   imageBuffer: Buffer;
   contentType: string;
 }): Promise<string> {
-  const blobToken = process.env.BLOB_READ_WRITE_TOKEN?.trim();
-
-  if (blobToken) {
-    const blob = await put(`uploads/${options.filename}`, options.imageBuffer, {
-      access: "public",
-      addRandomSuffix: true,
-      contentType: options.contentType,
-      token: blobToken,
-    });
-
-    return blob.url;
+  // Hugging Face upload logic
+  const hfToken = process.env.HUGGINGFACE_TOKEN;
+  const hfDataset = process.env.HUGGINGFACE_DATASET || "NickMuhigi/livestock-disease-detector";
+  if (!hfToken) {
+    throw new Error("HUGGINGFACE_TOKEN environment variable not set");
   }
+  // Upload to Hugging Face Hub (datasets API)
+  const uploadUrl = `https://huggingface.co/api/datasets/${hfDataset}/upload/file`;
+  const formData = new FormData();
+  formData.append("file", new Blob([options.imageBuffer], { type: options.contentType }), options.filename);
+  formData.append("path", `images/${options.filename}`);
 
-  if (process.env.VERCEL) {
-    throw new Error(
-      "BLOB_READ_WRITE_TOKEN is not configured. Add it in Vercel Environment Variables for production uploads."
-    );
+  const response = await fetch(uploadUrl, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${hfToken}`,
+    },
+    body: formData,
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`Failed to upload to Hugging Face: ${response.status} ${errorText}`);
   }
-
-  await ensureUploadsDir();
-  const filepath = path.join(uploadsDir, options.filename);
-  await fs.writeFile(filepath, options.imageBuffer);
-  return `/api/uploads/${options.filename}`;
+  // The public URL for the uploaded file
+  // Format: https://huggingface.co/datasets/{dataset}/resolve/main/images/{filename}
+  return `https://huggingface.co/datasets/${hfDataset}/resolve/main/images/${options.filename}`;
 }
 
 
