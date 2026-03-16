@@ -164,17 +164,19 @@ async function saveImageBuffer(options: {
   imageBuffer: Buffer;
   contentType: string;
 }): Promise<string> {
+
   // Hugging Face upload logic
   const hfToken = process.env.HUGGINGFACE_TOKEN;
   const hfDataset = process.env.HUGGINGFACE_DATASET || "NickMuhigi/livestock-disease-detector";
   if (!hfToken) {
     throw new Error("HUGGINGFACE_TOKEN environment variable not set");
   }
-  // Upload to Hugging Face Hub (datasets API)
-  const uploadUrl = `https://huggingface.co/api/datasets/${hfDataset}/upload/file`;
+  // Only use the base filename (no directory path)
+  const baseFilename = options.filename.split(/[\\/]/).pop();
+  const uploadUrl = `https://huggingface.co/api/datasets/${hfDataset}/upload/file?repo_type=dataset`;
   const formData = new FormData();
-  formData.append("file", new Blob([options.imageBuffer], { type: options.contentType }), options.filename);
-  formData.append("path", `images/${options.filename}`);
+  formData.append("file", new Blob([options.imageBuffer], { type: options.contentType }), baseFilename);
+  formData.append("path", `images/${baseFilename}`);
 
   const response = await fetch(uploadUrl, {
     method: "POST",
