@@ -8,6 +8,8 @@ import {
 import fs from "fs/promises";
 import path from "path";
 import { put } from "@vercel/blob";
+const FormData = require('form-data');
+const fetch = require('node-fetch');
 
 const DB_DISEASE_TYPES = new Set([
   "HEALTHY",
@@ -175,13 +177,17 @@ async function saveImageBuffer(options: {
   const baseFilename = options.filename.split(/[\\/]/).pop();
   const uploadUrl = `https://huggingface.co/api/datasets/${hfDataset}/upload/file?repo_type=dataset`;
   const formData = new FormData();
-  formData.append("file", new Blob([options.imageBuffer], { type: options.contentType }), baseFilename);
+  formData.append("file", options.imageBuffer, {
+    filename: baseFilename,
+    contentType: options.contentType
+  });
   formData.append("path", `images/${baseFilename}`);
 
   const response = await fetch(uploadUrl, {
     method: "POST",
     headers: {
       Authorization: `Bearer ${hfToken}`,
+      ...formData.getHeaders()
     },
     body: formData,
   });
