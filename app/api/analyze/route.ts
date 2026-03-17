@@ -69,6 +69,7 @@ async function analyzeCattleImage(
   for (const apiUrl of MODEL_API_URLS) {
     try {
       const formData = new FormData();
+      // Use 'file' as the key for Hugging Face compatibility
       formData.append("file", imageBuffer, {
         filename: "image.jpg",
         contentType: "image/jpeg"
