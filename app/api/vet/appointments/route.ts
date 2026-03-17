@@ -73,8 +73,8 @@ export async function GET(req: NextRequest) {
             // Hugging Face or other full URL, use as-is
             // do nothing
           } else if (imageUrl.startsWith('/uploads/')) {
-            // Local upload, use as-is (should not exist after migration)
-            // do nothing
+            // Local upload, convert to API route
+            imageUrl = `/api/uploads/${imageUrl.replace(/^\/uploads\//, '')}`;
           } else {
             // Bare filename, convert to Hugging Face URL
             imageUrl = `https://huggingface.co/datasets/NickMuhigi/livestock-disease-detector/resolve/main/images/${imageUrl.replace(/^\/+/,'')}`;
