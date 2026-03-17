@@ -33,9 +33,9 @@ function resolveImageUrl(imageUrl: string): string {
   if (imageUrl.startsWith("http")) {
     return imageUrl;
   }
-  // Only prepend /api/uploads/ for local uploads
+  // Serve local images directly from /uploads in production
   if (imageUrl.startsWith("/uploads/")) {
-    return `/api/uploads/${imageUrl.replace(/^\/uploads\//, "")}`;
+    return imageUrl;
   }
   // If it's a bare filename, assume it's Hugging Face (should not happen after migration, but fallback)
   if (!imageUrl.startsWith("/")) {

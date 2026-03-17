@@ -35,7 +35,8 @@ function resolveAnalysisImageUrl(imageUrl?: string | null): string | null {
     return imageUrl;
   }
   if (imageUrl.startsWith("/uploads/")) {
-    return `/api/uploads/${imageUrl.replace(/^\/uploads\//, "")}`;
+    // Serve local images directly from /uploads in production
+    return imageUrl;
   }
   if (!imageUrl.startsWith("/")) {
     return `https://huggingface.co/datasets/NickMuhigi/livestock-disease-detector/resolve/main/images/${imageUrl}`;
