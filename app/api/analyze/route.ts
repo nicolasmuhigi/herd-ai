@@ -179,6 +179,7 @@ async function saveImageBuffer(options: {
 }): Promise<string> {
 
   // Hugging Face upload logic
+
   const hfToken = process.env.HUGGINGFACE_TOKEN;
   const hfDataset = process.env.HUGGINGFACE_DATASET || "NickMuhigi/livestock-disease-detector";
   if (!hfToken) {
@@ -193,6 +194,15 @@ async function saveImageBuffer(options: {
     contentType: options.contentType
   });
   formData.append("path", `images/${baseFilename}`);
+
+  // Debug logging
+  console.log("--- Hugging Face Upload Debug ---");
+  console.log("Upload URL:", uploadUrl);
+  console.log("Token (masked):", hfToken.slice(0, 6) + "..." + hfToken.slice(-4));
+  console.log("FormData keys:", Object.keys(formData));
+  console.log("FormData path:", `images/${baseFilename}`);
+  console.log("FormData filename:", baseFilename);
+  console.log("FormData contentType:", options.contentType);
 
   const response = await fetch(uploadUrl, {
     method: "POST",
