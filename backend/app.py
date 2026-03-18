@@ -322,7 +322,8 @@ async def predict(file: UploadFile = File(...)):
 if __name__ == "__main__":
     import uvicorn
     try:
-        port = int(os.environ.get("PORT", 7860))
+        port = int(os.environ.get("PORT", 8000))
+        logger.info(f"Starting server on 0.0.0.0:{port} (Render expects PORT env)")
         uvicorn.run(app, host="0.0.0.0", port=port)
     except Exception as e:
         logger.exception("Fatal error during startup: %s", e)
