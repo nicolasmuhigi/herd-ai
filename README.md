@@ -1,5 +1,90 @@
 # Herd AI: Livestock Health Management Platform
 
+## Overview
+Herd AI is a full-stack web platform for livestock disease screening, vet booking, and herd health tracking. It uses AI-powered image analysis, persistent cloud storage, and robust authentication to deliver a seamless experience for farmers and veterinarians.
+
+## How the App Works
+- **User Flow:**
+  1. Users sign up and log in.
+  2. Upload cattle images for disease analysis.
+  3. Images are sent to the backend, which uploads them to Supabase Storage.
+  4. Backend returns a public URL for each image.
+  5. Frontend displays images using these URLs everywhere (dashboard, results, vet review).
+  6. Analysis results and image URLs are stored in PostgreSQL for history and vet review.
+  7. Users can book appointments with vets, view history, and chat with AI assistant.
+
+- **Image Analysis:**
+  - Images are analyzed using a TensorFlow/Keras model, served via Hugging Face Space or FastAPI proxy.
+  - Results include disease prediction, confidence, and probability scores.
+
+- **History Management:**
+  - Analyses history is fetched from the database and displayed with filtering/search.
+  - Users can delete all history via a dedicated button (calls DELETE API).
+
+## Technologies Used
+- **Frontend:** Next.js (App Router)
+- **Backend:** FastAPI (Python), Next.js API routes (Node.js)
+- **Model Inference:** TensorFlow/Keras, Hugging Face Space, FastAPI proxy
+- **Storage:** Supabase Storage (persistent, free)
+- **Database:** PostgreSQL + Prisma ORM
+- **Authentication:** JWT
+- **Deployment:** Render (Blueprint for frontend/backend/db), Hugging Face Space (model API)
+- **Other:** Docker (for model API), PowerShell/Bash scripts, Prisma migrations
+
+## APIs
+- `/api/analyze`: Image analysis (calls model API, stores results)
+- `/api/analyses`: Fetch and delete analyses history (GET, DELETE)
+- `/api/auth/signup`: User registration
+- `/api/auth/login`: User login
+- `/api/chat`: Gemini AI chat
+- `/api/health`: Health check endpoint
+- FastAPI backend: `/predict`, `/health`, `/` (model info)
+
+## Deployment
+- **Render Blueprint:**
+  - Frontend: Next.js app
+  - Backend: FastAPI proxy
+  - Database: Managed PostgreSQL
+  - All services defined in `render.yaml`
+
+- **Hugging Face Space:**
+  - Dockerized FastAPI model API
+  - Model file (`cattle_model.keras`) uploaded to Space
+  - API URL used in frontend/backend env vars
+
+- **Setup Steps:**
+  1. Clone repo, install dependencies (`npm install`, `pip install -r requirements.txt`)
+  2. Create `.env.local` with all required secrets and API URLs
+  3. Run Prisma migrations (`npx prisma generate`, `npx prisma migrate dev`)
+  4. Start frontend (`npm run dev`) and backend (`uvicorn app:app`)
+  5. Deploy to Render using `render.yaml`
+  6. Deploy model API to Hugging Face Space
+
+## Repository Structure
+- `app/`: Next.js pages and API routes
+- `components/`: UI components
+- `lib/`: Auth, model inference, email, helpers
+- `backend/`: FastAPI services (proxy, model server)
+- `huggingface-space/`: Dockerized FastAPI model API
+- `prisma/`: Database schema and migrations
+- `scripts/`: Helper scripts (Python inference bridge)
+
+## Common Issues & Solutions
+- Model API unavailable: Set `MODEL_API_URL` to a reachable endpoint.
+- Prisma errors: Check `DATABASE_URL`, run migrations.
+- Upload failures: Set `BLOB_READ_WRITE_TOKEN` for Vercel.
+- Gemini chat errors: Ensure `GEMINI_API_KEY` is valid.
+
+## Useful Commands
+- `npm run dev`, `npm run build`, `npm run start`, `npm run lint`
+- `npx prisma generate`, `npx prisma migrate dev`
+- `pip install -r requirements.txt`
+- `uvicorn app:app --host 0.0.0.0 --port 7860`
+
+---
+The rest of the README contains detailed setup, deployment, and API instructions. See below for full guides and examples.
+# Herd AI: Livestock Health Management Platform
+
 AI-powered web platform for livestock disease screening, vet booking, and herd health tracking.
 
 ## Persistent Image Uploads & Storage

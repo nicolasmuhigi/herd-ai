@@ -1,3 +1,34 @@
+export async function DELETE(req: NextRequest) {
+  try {
+    // Verify authentication
+    const token = getTokenFromRequest(req);
+    if (!token) {
+      return NextResponse.json(
+        { error: "Unauthorized" },
+        { status: 401 }
+      );
+    }
+
+    const payload = verifyToken(token);
+    if (!payload) {
+      return NextResponse.json(
+        { error: "Invalid token" },
+        { status: 401 }
+      );
+    }
+
+    // Delete all analyses
+    await prisma.analysis.deleteMany({});
+
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error("Failed to delete analyses:", error);
+    return NextResponse.json(
+      { error: "Failed to delete analyses" },
+      { status: 500 }
+    );
+  }
+}
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getTokenFromRequest, verifyToken } from "@/lib/jwt";

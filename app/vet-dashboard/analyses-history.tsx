@@ -39,6 +39,28 @@ export default function AnalysesHistorySection() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState("")
   const [uploadedPreview, setUploadedPreview] = useState<string | null>(null)
+  const [deleting, setDeleting] = useState(false)
+  const handleDeleteAll = async () => {
+    if (!confirm("Are you sure you want to delete all analyses history? This action cannot be undone.")) return;
+    setDeleting(true);
+    try {
+      const token = localStorage.getItem("authToken");
+      const response = await fetch("/api/analyses", {
+        method: "DELETE",
+        headers: { "Authorization": `Bearer ${token}` },
+      });
+      if (response.ok) {
+        setAnalyses([]);
+        alert("All analyses history deleted.");
+      } else {
+        setError("Failed to delete analyses history.");
+      }
+    } catch (err) {
+      setError("Failed to delete analyses history.");
+    } finally {
+      setDeleting(false);
+    }
+  } 
 
   useEffect(() => {
     const fetchAnalyses = async () => {
@@ -114,6 +136,13 @@ export default function AnalysesHistorySection() {
           onChange={e => setSearch(e.target.value)}
           className="max-w-md"
         />
+        <button
+          onClick={handleDeleteAll}
+          disabled={deleting || loading}
+          className="ml-auto px-4 py-2 bg-destructive text-white rounded hover:bg-destructive/80 disabled:opacity-50"
+        >
+          {deleting ? "Deleting..." : "Delete All History"}
+        </button>
       </div>
       {filtered.length === 0 ? (
         <div className="py-8 text-center text-muted-foreground">No analyses found.</div>
