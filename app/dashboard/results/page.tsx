@@ -31,16 +31,7 @@ interface ResultCard {
 
 function resolveAnalysisImageUrl(imageUrl?: string | null): string | null {
   if (!imageUrl) return null;
-  if (imageUrl.startsWith("http")) {
-    return imageUrl;
-  }
-  if (imageUrl.startsWith("/uploads/")) {
-    // Serve local images directly from /uploads in production
-    return imageUrl;
-  }
-  if (!imageUrl.startsWith("/")) {
-    return `https://huggingface.co/datasets/NickMuhigi/livestock-disease-detector/resolve/main/images/${imageUrl}`;
-  }
+  if (imageUrl.startsWith("http")) return imageUrl;
   return imageUrl;
 }
 

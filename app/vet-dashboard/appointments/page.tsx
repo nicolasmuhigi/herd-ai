@@ -29,18 +29,7 @@ interface Appointment {
 
 function resolveImageUrl(imageUrl: string): string {
   if (!imageUrl) return "";
-  // Supabase public URL always starts with https://txkdxixqjytvxhkerndt.supabase.co/storage/v1/object/public/uploads/
-  if (imageUrl.startsWith("http")) {
-    return imageUrl;
-  }
-  // Local dev: /uploads/...
-  if (imageUrl.startsWith("/uploads/")) {
-    return imageUrl;
-  }
-  // Fallback: Hugging Face legacy
-  if (!imageUrl.startsWith("/")) {
-    return `https://huggingface.co/datasets/NickMuhigi/livestock-disease-detector/resolve/main/images/${imageUrl}`;
-  }
+  if (imageUrl.startsWith("http")) return imageUrl;
   return imageUrl;
 }
 
