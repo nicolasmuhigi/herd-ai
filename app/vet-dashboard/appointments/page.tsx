@@ -38,6 +38,7 @@ export default function VetAppointmentsPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState("")
   const [updatingId, setUpdatingId] = useState<string | null>(null)
+  const [uploadedPreview, setUploadedPreview] = useState<string | null>(null)
 
   useEffect(() => {
     const fetchAppointments = async () => {
@@ -71,6 +72,11 @@ export default function VetAppointmentsPage() {
     }
 
     fetchAppointments()
+    // Load uploadedPreview from localStorage
+    const savedPreview = localStorage.getItem("latestUploadedPreview")
+    if (savedPreview) {
+      setUploadedPreview(savedPreview)
+    }
   }, [])
 
   const handleApprove = async (appointmentId: string) => {
@@ -179,7 +185,7 @@ export default function VetAppointmentsPage() {
                 <div className="lg:w-1/4 bg-secondary flex items-center justify-center p-6 min-h-80">
                   {appointment.analysis ? (
                     <img
-                      src={resolveAnalysisImageUrl(appointment.analysis.imageUrl)}
+                      src={uploadedPreview || resolveAnalysisImageUrl(appointment.analysis.imageUrl) || undefined}
                       alt="Uploaded cattle image"
                       className="max-h-96 max-w-full object-contain rounded-lg shadow-sm"
                     />

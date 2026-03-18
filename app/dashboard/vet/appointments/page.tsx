@@ -38,6 +38,7 @@ export default function VetDashboardPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState("")
   const [updatingId, setUpdatingId] = useState<string | null>(null)
+  const [uploadedPreview, setUploadedPreview] = useState<string | null>(null)
 
   useEffect(() => {
     const fetchAppointments = async () => {
@@ -71,6 +72,11 @@ export default function VetDashboardPage() {
     }
 
     fetchAppointments()
+    // Load uploadedPreview from localStorage
+    const savedPreview = localStorage.getItem("latestUploadedPreview")
+    if (savedPreview) {
+      setUploadedPreview(savedPreview)
+    }
   }, [])
 
   const handleApprove = async (appointmentId: string) => {
@@ -179,13 +185,11 @@ export default function VetDashboardPage() {
               <div className="flex flex-col md:flex-row h-full">
                 {/* Image Section */}
                 {appointment.analysis ? (
-                  <div className="md:w-1/3 bg-secondary flex items-center justify-center p-4">
-                    <img
-                      src={resolveAnalysisImageUrl(appointment.analysis.imageUrl)}
-                      alt="Uploaded cattle image"
-                      className="max-h-80 max-w-full object-contain rounded"
-                    />
-                  </div>
+                  <img
+                    src={uploadedPreview || resolveAnalysisImageUrl(appointment.analysis.imageUrl) || undefined}
+                    alt="Uploaded cattle image"
+                    className="max-h-80 max-w-full object-contain rounded"
+                  />
                 ) : (
                   <div className="md:w-1/3 bg-secondary flex items-center justify-center p-4">
                     <p className="text-sm text-muted-foreground">No image available</p>

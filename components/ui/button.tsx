@@ -42,16 +42,15 @@ function Button({
   size,
   asChild = false,
   ...props
-}: React.ComponentProps<'div'> &
+}: React.ComponentProps<'button'> &
   VariantProps<typeof buttonVariants> & {
     asChild?: boolean
   }) {
-  const Comp = asChild ? Slot : 'div'
+  const Comp = asChild ? Slot : 'button'
 
   return (
     <Comp
-      role="button"
-      tabIndex={0}
+      type={props.type || 'button'}
       data-slot="button"
       className={cn(buttonVariants({ variant, size, className }), 'cursor-pointer')}
       {...props}

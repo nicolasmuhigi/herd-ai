@@ -40,6 +40,7 @@ export default function AppointmentHistoryPage() {
   }>({ outcome: "", resolutionStatus: "" })
   const [savingId, setSavingId] = useState<string | null>(null)
   const [deletingId, setDeletingId] = useState<string | null>(null)
+  const [uploadedPreview, setUploadedPreview] = useState<string | null>(null)
 
   useEffect(() => {
     const fetchHistory = async () => {
@@ -66,6 +67,11 @@ export default function AppointmentHistoryPage() {
     }
 
     fetchHistory()
+    // Load uploadedPreview from localStorage
+    const savedPreview = localStorage.getItem("latestUploadedPreview");
+    if (savedPreview) {
+      setUploadedPreview(savedPreview);
+    }
   }, [])
 
   const startEdit = (apt: AppointmentWithAnalysis) => {
@@ -407,7 +413,7 @@ export default function AppointmentHistoryPage() {
             {apt.analysis?.imageUrl && (
               <div className="rounded-lg overflow-hidden border border-border">
                 <img 
-                  src={resolveAnalysisImageUrl(apt.analysis.imageUrl)} 
+                  src={uploadedPreview || resolveAnalysisImageUrl(apt.analysis.imageUrl) || undefined} 
                   alt="Cattle analysis image"
                   className="w-full h-48 object-cover"
                 />

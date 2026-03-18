@@ -38,6 +38,7 @@ export default function AnalysesHistorySection() {
   const [filter, setFilter] = useState("all")
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState("")
+  const [uploadedPreview, setUploadedPreview] = useState<string | null>(null)
 
   useEffect(() => {
     const fetchAnalyses = async () => {
@@ -59,6 +60,11 @@ export default function AnalysesHistorySection() {
       }
     }
     fetchAnalyses()
+    // Load uploadedPreview from localStorage
+    const savedPreview = localStorage.getItem("latestUploadedPreview")
+    if (savedPreview) {
+      setUploadedPreview(savedPreview)
+    }
   }, [])
 
   const filtered = analyses.filter(a => {
@@ -122,7 +128,11 @@ export default function AnalysesHistorySection() {
               <div className="font-medium">Disease: <span className="text-primary">{a.detectedDisease}</span></div>
               <div className="text-xs">Confidence: {(a.confidence * 100).toFixed(1)}%</div>
               {a.imageUrl && (
-                <img src={resolveAnalysisImageUrl(a.imageUrl) || undefined} alt="Analysis" className="w-full h-32 object-cover rounded border" />
+                <img
+                  src={uploadedPreview || resolveAnalysisImageUrl(a.imageUrl) || undefined}
+                  alt="Analysis"
+                  className="w-full h-32 object-cover rounded border"
+                />
               )}
             </Card>
           ))}
