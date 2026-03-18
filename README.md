@@ -2,6 +2,31 @@
 
 AI-powered web platform for livestock disease screening, vet booking, and herd health tracking.
 
+## Persistent Image Uploads & Storage
+
+**Uploads are now stored in Supabase Storage (bucket: `uploads`) for production reliability.**
+- Images uploaded via the app are sent to the backend, which uploads them to Supabase Storage.
+- The backend returns a public Supabase URL for each image.
+- The frontend displays images using these Supabase URLs, ensuring images are visible everywhere (vet dashboard, results page, etc.), even after deployment/restart.
+- Local development uses `public/uploads/` for quick testing, but production always uses Supabase.
+
+### Technologies Used
+- **Frontend:** Next.js (App Router)
+- **Backend:** FastAPI (Python)
+- **Model Inference:** Keras/TensorFlow, Hugging Face Space, or FastAPI proxy
+- **Storage:** Supabase Storage (persistent, free, no credit card required)
+- **Database:** PostgreSQL + Prisma
+- **Authentication:** JWT
+- **Deployment:** Render (Blueprint for frontend/backend/db), Hugging Face Space (model API)
+
+### Deployment Workflow
+1. User uploads image via dashboard.
+2. Backend uploads image to Supabase Storage and returns public URL.
+3. Frontend displays image using Supabase URL.
+4. Analysis results and image URLs are stored in database for history and vet review.
+
+See below for full deployment and setup instructions.
+
 ## Demo
 - Video: https://drive.google.com/file/d/1IhiLub_UjQdqkYT8ZwwzWAHMCBRRLrZ3/view?usp=sharing
 - Live app: https://livestock-frontend.onrender.com/

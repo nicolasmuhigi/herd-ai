@@ -29,15 +29,15 @@ interface Appointment {
 
 function resolveImageUrl(imageUrl: string): string {
   if (!imageUrl) return "";
-  // If already a full URL (Hugging Face or http), return as-is
+  // Supabase public URL always starts with https://txkdxixqjytvxhkerndt.supabase.co/storage/v1/object/public/uploads/
   if (imageUrl.startsWith("http")) {
     return imageUrl;
   }
-  // Serve local images directly from /uploads in production
+  // Local dev: /uploads/...
   if (imageUrl.startsWith("/uploads/")) {
     return imageUrl;
   }
-  // If it's a bare filename, assume it's Hugging Face (should not happen after migration, but fallback)
+  // Fallback: Hugging Face legacy
   if (!imageUrl.startsWith("/")) {
     return `https://huggingface.co/datasets/NickMuhigi/livestock-disease-detector/resolve/main/images/${imageUrl}`;
   }

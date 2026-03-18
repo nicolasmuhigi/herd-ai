@@ -24,6 +24,20 @@ interface AppointmentWithAnalysis {
 }
 
 export default function AppointmentHistoryPage() {
+    // Helper to resolve Supabase or legacy image URLs
+    function resolveAnalysisImageUrl(imageUrl?: string | null): string | null {
+      if (!imageUrl) return null;
+      if (imageUrl.startsWith("http")) {
+        return imageUrl;
+      }
+      if (imageUrl.startsWith("/uploads/")) {
+        return imageUrl;
+      }
+      if (!imageUrl.startsWith("/")) {
+        return `https://huggingface.co/datasets/NickMuhigi/livestock-disease-detector/resolve/main/images/${imageUrl}`;
+      }
+      return imageUrl;
+    }
   const [appointments, setAppointments] = useState<AppointmentWithAnalysis[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState("")
@@ -199,50 +213,39 @@ export default function AppointmentHistoryPage() {
       // Include uploaded image if available
       if (apt.analysis?.imageUrl) {
         try {
-          const imageUrl = apt.analysis.imageUrl.startsWith('http') 
-            ? apt.analysis.imageUrl 
-            : `${window.location.origin}${apt.analysis.imageUrl}`
-          
-          // Load image and convert to base64
-          const response = await fetch(imageUrl)
-          const blob = await response.blob()
-          const reader = new FileReader()
-          
+          const resolvedUrl = resolveAnalysisImageUrl(apt.analysis.imageUrl);
+          const response = await fetch(resolvedUrl!);
+          const blob = await response.blob();
+          const reader = new FileReader();
           await new Promise((resolve, reject) => {
             reader.onloadend = () => {
               try {
-                const base64data = reader.result as string
-                
-                // Add image section header
-                doc.setFontSize(14)
-                doc.setFont("helvetica", "bold")
-                doc.text("Uploaded Livestock Image", 15, yOffset)
-                yOffset += 8
-
-                // Calculate image dimensions to fit nicely on page
-                const maxWidth = pageWidth - 30
-                const maxHeight = 80
-                const imgWidth = Math.min(maxWidth, 120)
-                const imgHeight = Math.min(maxHeight, 80)
-
-                // Add image
-                doc.addImage(base64data, 'JPEG', 15, yOffset, imgWidth, imgHeight)
-                yOffset += imgHeight + 10
-                resolve(true)
+                const base64data = reader.result as string;
+                doc.setFontSize(14);
+                doc.setFont("helvetica", "bold");
+                doc.text("Uploaded Livestock Image", 15, yOffset);
+                yOffset += 8;
+                const maxWidth = pageWidth - 30;
+                const maxHeight = 80;
+                const imgWidth = Math.min(maxWidth, 120);
+                const imgHeight = Math.min(maxHeight, 80);
+                doc.addImage(base64data, 'JPEG', 15, yOffset, imgWidth, imgHeight);
+                yOffset += imgHeight + 10;
+                resolve(true);
               } catch (err) {
-                console.error("Error adding image:", err)
-                resolve(false)
+                console.error("Error adding image:", err);
+                resolve(false);
               }
-            }
-            reader.onerror = reject
-            reader.readAsDataURL(blob)
-          })
+            };
+            reader.onerror = reject;
+            reader.readAsDataURL(blob);
+          });
         } catch (err) {
-          console.error("Failed to load image:", err)
-          doc.setFontSize(10)
-          doc.setFont("helvetica", "italic")
-          doc.text("(Image could not be loaded)", 15, yOffset)
-          yOffset += 10
+          console.error("Failed to load image:", err);
+          doc.setFontSize(10);
+          doc.setFont("helvetica", "italic");
+          doc.text("(Image could not be loaded)", 15, yOffset);
+          yOffset += 10;
         }
       }
 
