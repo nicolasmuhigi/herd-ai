@@ -1,31 +1,28 @@
 
 # Herd AI: Livestock Health Management Platform
-#
 ## Demo
 - [Video walkthrough](https://drive.google.com/file/d/1IhiLub_UjQdqkYT8ZwwzWAHMCBRRLrZ3/view?usp=sharing)
 - [Live app](https://livestock-frontend.onrender.com/)
 
 ## Screenshots & Testing Results
 
-Below are screenshots demonstrating core functionalities, testing with different data values, and performance on various environments. Replace these placeholders with your actual screenshots before submission.
+Below are screenshots demonstrating core functionalities, testing with different data values, and performance on various environments. 
 
 ### Dashboard & Disease Analysis
-![Dashboard Screenshot](screenshots/dashboard.png)
-![Disease Analysis Screenshot](screenshots/analysis.png)
+<img width="1918" height="922" alt="Herd-Ai Dashboard" src="https://github.com/user-attachments/assets/6dbc9a70-6fab-4555-9a31-eaf282ffeaf3" />
+<img width="1897" height="925" alt="Herd-Ai Assistant" src="https://github.com/user-attachments/assets/76cf708b-1918-451e-8b4d-de3960cf199c" />
 
 ### Vet Booking & History
-![Vet Booking Screenshot](screenshots/booking.png)
-![Analyses History Screenshot](screenshots/history.png)
+<img width="1896" height="922" alt="Herd-Ai Booking-1" src="https://github.com/user-attachments/assets/3101aeb0-e2a8-460b-a574-763679e4972b" />
+<img width="1893" height="922" alt="Herd-Ai Booking-2" src="https://github.com/user-attachments/assets/f1ae71cf-597b-4056-b32a-c3cc6e261ed8" />
+<img width="1895" height="922" alt="Herd-Ai Vet Dashboard" src="https://github.com/user-attachments/assets/fd61756f-3d33-46f7-8701-e4f5590e7ec6" />
+<img width="1893" height="925" alt="Herd-Ai Vet Dashboard-2" src="https://github.com/user-attachments/assets/c0970252-b507-454b-9311-4c650b320956" />
 
 ### Testing with Different Data Values
-![Healthy Cattle Result](screenshots/healthy.png)
-![Disease Detected Result](screenshots/disease.png)
-
-### Performance & Error Handling
-![Performance Screenshot](screenshots/performance.png)
-![Error Handling Screenshot](screenshots/error.png)
-- [Video walkthrough](https://drive.google.com/file/d/1IhiLub_UjQdqkYT8ZwwzWAHMCBRRLrZ3/view?usp=sharing)
-- [Live app](https://livestock-frontend.onrender.com/)
+<img width="1898" height="925" alt="Herd-Ai Disease-1" src="https://github.com/user-attachments/assets/b2bc25c7-9100-4f06-b98d-a21112229b3a" />
+<img width="1897" height="922" alt="Herd-Ai Disease-2" src="https://github.com/user-attachments/assets/f76e83c4-31e3-4153-b405-bff042e51394" />
+<img width="1897" height="922" alt="Herd-Ai Disease-3" src="https://github.com/user-attachments/assets/8d24ea6d-a5ea-4efb-bcf4-d2ca6bfdc8d3" />
+<img width="1895" height="921" alt="Herd-Ai Healthy" src="https://github.com/user-attachments/assets/1932ed28-966e-43e2-985b-68eb85d22ab1" />
 
 ## Overview
 Herd AI is a full-stack web platform for livestock disease screening, vet booking, and herd health tracking. It uses AI-powered image analysis, persistent cloud storage, and robust authentication to deliver a seamless experience for farmers and veterinarians.
