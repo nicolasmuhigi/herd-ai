@@ -217,10 +217,3 @@ This project is MIT licensed. AI model, UI, and backend code are original or pro
 
 ---
 
-## Rubric Alignment & Competition Readiness
-- Demonstrates planned functionalities with screenshots, video, and live app
-- Step-by-step setup and deployment for any environment
-- API documentation and troubleshooting for easy integration
-- Professional, clear, and comprehensive — ready for academic, industry, and competition review
-3. Push and open a PR
-
