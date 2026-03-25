@@ -35,25 +35,9 @@ def resolve_class_labels() -> list[str]:
 
 CLASS_LABELS = resolve_class_labels()
 MODEL_PATH_CANDIDATES = [
-    "../cattle_model.keras",
-    "cattle_model.keras",
     "./cattle_model.keras",
     "../cattle_model.keras",
     "cattle_model.keras",
-
-# --- Model auto-download logic ---
-import os
-import requests
-
-MODEL_PATH = "cattle_model.keras"
-MODEL_URL = os.environ.get("MODEL_URL")
-
-if MODEL_URL and not os.path.exists(MODEL_PATH):
-    print(f"Downloading model from {MODEL_URL}...")
-    r = requests.get(MODEL_URL)
-    with open(MODEL_PATH, "wb") as f:
-        f.write(r.content)
-    print("Model downloaded.")
 ]
 
 model = None
