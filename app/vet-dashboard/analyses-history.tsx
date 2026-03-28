@@ -158,7 +158,7 @@ export default function AnalysesHistorySection() {
               <div className="text-xs">Confidence: {(a.confidence * 100).toFixed(1)}%</div>
               {a.imageUrl && (
                 <img
-                  src={uploadedPreview || resolveAnalysisImageUrl(a.imageUrl) || undefined}
+                  src={resolveAnalysisImageUrl(a.imageUrl) || undefined}
                   alt="Analysis"
                   className="w-full h-32 object-cover rounded border"
                 />
