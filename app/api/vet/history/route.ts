@@ -1,3 +1,4 @@
+import { normalizeImageUrl } from "@/lib/utils";
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getTokenFromRequest, verifyToken } from "@/lib/jwt";
@@ -58,18 +59,7 @@ export async function GET(req: NextRequest) {
           });
         }
 
-        // Normalize imageUrl as in vet/appointments/route.ts
-        let imageUrl = analysis?.imageUrl || null;
-        if (imageUrl) {
-          if (imageUrl.startsWith('http')) {
-            // Use as-is
-          } else if (imageUrl.startsWith('/uploads/')) {
-            imageUrl = `/api/uploads/${imageUrl.replace(/^\/uploads\//, '')}`;
-          } else {
-            imageUrl = `https://huggingface.co/datasets/NickMuhigi/livestock-disease-detector/resolve/main/images/${imageUrl.replace(/^\/+/,'')}`;
-          }
-        }
-
+        let imageUrl = normalizeImageUrl(analysis?.imageUrl);
         return {
           ...apt,
           analysis: analysis

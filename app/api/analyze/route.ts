@@ -1,3 +1,4 @@
+import { normalizeImageUrl } from "@/lib/utils";
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getTokenFromRequest, verifyToken } from "@/lib/jwt";
@@ -759,7 +760,7 @@ export async function POST(req: NextRequest) {
       success: true,
       analysis: {
         id: analysis.id,
-        imageUrl: analysis.imageUrl,
+        imageUrl: normalizeImageUrl(analysis.imageUrl),
         predictions: {
           healthy: predictions.healthy,
           footAndMouth: predictions.footAndMouth,

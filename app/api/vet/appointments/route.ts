@@ -1,3 +1,4 @@
+import { normalizeImageUrl } from "@/lib/utils";
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getTokenFromRequest, verifyToken } from "@/lib/jwt";
@@ -67,19 +68,7 @@ export async function GET(req: NextRequest) {
         }
 
 
-        let imageUrl = analysis?.imageUrl || null;
-        if (imageUrl) {
-          if (imageUrl.startsWith('http')) {
-            // Hugging Face or other full URL, use as-is
-            // do nothing
-          } else if (imageUrl.startsWith('/uploads/')) {
-            // Local upload, convert to API route
-            imageUrl = `/api/uploads/${imageUrl.replace(/^\/uploads\//, '')}`;
-          } else {
-            // Bare filename, convert to Hugging Face URL
-            imageUrl = `https://huggingface.co/datasets/NickMuhigi/livestock-disease-detector/resolve/main/images/${imageUrl.replace(/^\/+/,'')}`;
-          }
-        }
+        let imageUrl = normalizeImageUrl(analysis?.imageUrl);
 
         let imageExists = false;
         if (imageUrl && imageUrl.startsWith('/uploads/')) {
