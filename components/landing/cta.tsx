@@ -81,7 +81,7 @@ export function CTA() {
                     <span className="text-muted-foreground flex-1 truncate">npm create herd-ai@latest</span>
                     <div className="text-xs px-2 py-1 rounded bg-primary/20 text-primary hover:bg-primary/30 transition-colors font-bold flex-shrink-0 cursor-pointer">Copy</div>
                   </div>
-                  <p className="text-xs text-muted-foreground">Takes just 30 seconds to get started 🚀</p>
+                  <p className="text-xs text-muted-foreground">Takes just 30 seconds to get started </p>
                 </div>
               </div>
             </div>
