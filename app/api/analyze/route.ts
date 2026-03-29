@@ -11,6 +11,7 @@ import { uploadImageToSupabase } from "@/lib/supabase-upload";
 import { v4 as uuidv4 } from "uuid";
 import modelFetch from "node-fetch";
 import { FormData as NodeFormData, File as NodeFile } from "formdata-node";
+import { LOCAL_CLINICS } from "@/lib/local-clinics";
 
 const DB_DISEASE_TYPES = new Set([
   "HEALTHY",
@@ -555,6 +556,21 @@ out body geom;`;
       );
 
     if (clinics.length === 0) {
+      // Local fallback: try to find a clinic for the nearest district
+      const fallbackDistrict = findNearestRwandaDistrict(latitude, longitude);
+      if (fallbackDistrict) {
+        const localClinic = LOCAL_CLINICS.find(
+          c => c.district.toLowerCase() === fallbackDistrict.toLowerCase()
+        );
+        if (localClinic) {
+          return {
+            name: localClinic.name,
+            address: localClinic.address,
+            phone: localClinic.phone,
+            distanceKm: 0,
+          };
+        }
+      }
       return null;
     }
 
