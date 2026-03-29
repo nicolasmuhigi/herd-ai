@@ -187,7 +187,7 @@ export default function VetAppointmentsPage() {
                 <div className="lg:w-1/4 bg-secondary flex items-center justify-center p-6 min-h-80">
                   {appointment.analysis ? (
                     <img
-                      src={uploadedPreview || resolveAnalysisImageUrl(appointment.analysis.imageUrl) || undefined}
+                      src={resolveAnalysisImageUrl(appointment.analysis.imageUrl) || undefined}
                       alt="Uploaded cattle image"
                       className="max-h-96 max-w-full object-contain rounded-lg shadow-sm"
                     />
