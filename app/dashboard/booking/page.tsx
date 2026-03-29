@@ -203,8 +203,10 @@ export default function BookingPage() {
 
       // Add new appointment to local state
       const result = parsed.data
-      if (result.appointment) {
-        setAppointments(prev => [...prev, result.appointment])
+      if (result && result.appointment) {
+        setAppointments(prev =>
+          result.appointment ? [...prev, result.appointment] : prev
+        )
       }
 
       setBooked(true)
@@ -276,8 +278,37 @@ export default function BookingPage() {
             <p className="text-sm text-muted-foreground">Loading veterinarians...</p>
           </div>
         ) : vets.length === 0 ? (
-          <div className="rounded-xl border border-border bg-card p-4">
-            <p className="text-sm text-muted-foreground">No veterinarians available at the moment.</p>
+          <div className="flex flex-col gap-2">
+            <div
+              className={`flex items-center gap-4 rounded-xl border p-4 cursor-pointer transition-all ${
+                selectedVet === 'avep'
+                  ? "border-primary bg-primary/5"
+                  : "border-border bg-card hover:border-primary/30"
+              }`}
+              onClick={() => setSelectedVet('avep')}
+            >
+              <div className={`flex h-11 w-11 items-center justify-center rounded-lg text-base font-bold flex-shrink-0 ${
+                selectedVet === 'avep'
+                  ? "bg-primary text-primary-foreground"
+                  : "bg-secondary text-muted-foreground border border-border"
+              }`}>
+                A
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="text-sm font-bold text-foreground">AVEP Co Ltd</div>
+                <div className="text-xs text-muted-foreground">avep@avep.co.rw</div>
+                <div className="mt-0.5 text-xs text-muted-foreground">
+                  <MapPin className="mr-1 inline h-3 w-3" />KN 5 Rd, Kigali
+                </div>
+              </div>
+              <div className={`flex h-5 w-5 items-center justify-center rounded-full border-2 transition-colors flex-shrink-0 ${
+                selectedVet === 'avep'
+                  ? "border-primary bg-primary"
+                  : "border-border"
+              }`}>
+                {selectedVet === 'avep' && <CheckCircle2 className="h-3 w-3 text-primary-foreground" />}
+              </div>
+            </div>
           </div>
         ) : (
           <div className="flex flex-col gap-2">
