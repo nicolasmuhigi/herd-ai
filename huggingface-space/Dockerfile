@@ -22,10 +22,10 @@ COPY app.py .
 COPY cattle_model.keras .
 
 # Expose port
-EXPOSE 7860
+EXPOSE $PORT
 
 # Set environment variable for TensorFlow
 ENV TF_CPP_MIN_LOG_LEVEL=2
 
 # Run the application
-CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "7860"]
+CMD ["sh", "-c", "uvicorn app:app --host 0.0.0.0 --port $PORT"]
