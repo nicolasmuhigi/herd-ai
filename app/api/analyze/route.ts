@@ -9,7 +9,8 @@ import {
 
 import { uploadImageToSupabase } from "@/lib/supabase-upload";
 import { v4 as uuidv4 } from "uuid";
-import { fetch as undiciFetch, FormData as UndiciFormData, Blob as UndiciBlob } from "undici";
+import modelFetch from "node-fetch";
+import { FormData as NodeFormData, File as NodeFile } from "formdata-node";
 
 const DB_DISEASE_TYPES = new Set([
   "HEALTHY",
@@ -67,18 +68,17 @@ async function analyzeCattleImage(
   // ESM imports used above; do not re-require here
   for (const apiUrl of MODEL_API_URLS) {
     try {
-      const formData = new UndiciFormData();
+      const formData = new NodeFormData();
       // Use 'file' as the key for Hugging Face compatibility
       formData.append(
         "file",
-        new UndiciBlob([imageBuffer], { type: "image/jpeg" }),
-        "image.jpg"
+        new NodeFile([imageBuffer], "image.jpg", { type: "image/jpeg" })
       );
 
-      const response = await undiciFetch(apiUrl, {
+      // Only pass method and body to node-fetch, do not pass Next.js fetch options
+      const response = await modelFetch(apiUrl, {
         method: "POST",
-        body: formData,
-        // Do NOT set headers; undici sets the correct multipart boundary
+        body: formData as any
       });
 
       if (!response.ok) {
