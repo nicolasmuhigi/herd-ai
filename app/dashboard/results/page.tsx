@@ -29,9 +29,12 @@ interface ResultCard {
   isHealthy: boolean
 }
 
+import { getPublicImageUrl } from "@/lib/supabase-upload";
 function resolveAnalysisImageUrl(imageUrl?: string | null): string | null {
   if (!imageUrl) return null;
   if (imageUrl.startsWith("http")) return imageUrl;
+  // If it looks like a Supabase Storage path, convert to public URL
+  if (!imageUrl.startsWith("/")) return getPublicImageUrl(imageUrl);
   return imageUrl;
 }
 

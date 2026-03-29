@@ -27,9 +27,11 @@ interface Appointment {
   } | null
 }
 
+import { getPublicImageUrl } from "@/lib/supabase-upload";
 function resolveAnalysisImageUrl(imageUrl?: string | null): string | null {
   if (!imageUrl) return null;
   if (imageUrl.startsWith("http")) return imageUrl;
+  if (!imageUrl.startsWith("/")) return getPublicImageUrl(imageUrl);
   return imageUrl;
 }
 

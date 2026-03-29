@@ -7,11 +7,8 @@ import {
   type PredictionResult,
 } from "@/lib/model-inference";
 
-import fs from "fs/promises";
-import path from "path";
-import { put } from "@vercel/blob";
-import FormData from "form-data";
-import fetch from "node-fetch";
+import { uploadImageToSupabase } from "@/lib/supabase-upload";
+import { v4 as uuidv4 } from "uuid";
 
 const DB_DISEASE_TYPES = new Set([
   "HEALTHY",
@@ -173,21 +170,8 @@ function buildUploadFileName(originalName: string): string {
   return `${Date.now()}_${safeName}`;
 }
 
-async function saveImageBuffer(options: {
-  filename: string;
-  imageBuffer: Buffer;
-  contentType: string;
-}): Promise<string> {
 
-  // Save image to public/uploads directory for compatibility
-  const publicUploadsDir = path.join(process.cwd(), "public", "uploads");
-  await fs.mkdir(publicUploadsDir, { recursive: true });
-  const baseFilename = options.filename.split(/[\\/]/).pop();
-  const savePath = path.join(publicUploadsDir, baseFilename);
-  await fs.writeFile(savePath, options.imageBuffer);
-  // Return local API URL for image access
-  return `/api/uploads/${baseFilename}`;
-}
+// saveImageBuffer is now replaced by uploadImageToSupabase
 
 
 
@@ -673,16 +657,18 @@ export async function POST(req: NextRequest) {
     const buffer = await imageFile.arrayBuffer();
     const imageBuffer = Buffer.from(buffer);
 
-    // Save image and run model inference concurrently
-    const filename = buildUploadFileName(imageFile.name);
-    const [predictions, imageUrl] = await Promise.all([
+    // Save image to Supabase and run model inference concurrently
+    const filename = imageFile.name;
+    const [predictions, imagePath] = await Promise.all([
       analyzeCattleImage(imageBuffer, req.nextUrl.origin),
-      saveImageBuffer({
-        filename,
+      uploadImageToSupabase({
         imageBuffer,
+        filename,
+        userId: payload.userId,
         contentType: imageFile.type || "application/octet-stream",
       }),
     ]);
+    const imageUrl = imagePath; // Store Supabase path in DB
 
     const dbDiseaseType = toDbDiseaseType(predictions.detectedDisease);
 
