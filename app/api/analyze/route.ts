@@ -556,22 +556,13 @@ out body geom;`;
       );
 
     if (clinics.length === 0) {
-      // Local fallback: try to find a clinic for the nearest district
-      const fallbackDistrict = findNearestRwandaDistrict(latitude, longitude);
-      if (fallbackDistrict) {
-        const localClinic = LOCAL_CLINICS.find(
-          c => c.district.toLowerCase() === fallbackDistrict.toLowerCase()
-        );
-        if (localClinic) {
-          return {
-            name: localClinic.name,
-            address: localClinic.address,
-            phone: localClinic.phone,
-            distanceKm: 0,
-          };
-        }
-      }
-      return null;
+      // Always return a default clinic if no other found
+      return {
+        name: "AVEP Co Ltd",
+        address: "KN 5 Rd, Kigali",
+        phone: "0788 508 343",
+        distanceKm: 0,
+      };
     }
 
     // Sort by distance and return nearest
