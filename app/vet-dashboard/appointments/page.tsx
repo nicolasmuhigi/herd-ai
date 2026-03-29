@@ -169,9 +169,13 @@ export default function VetAppointmentsPage() {
         </Card>
       ) : (
         <div className="space-y-6">
-          {appointments
-            .filter(a => a.status === "PENDING")
-            .map(appointment => (
+          {Array.from(
+            new Map(
+              appointments
+                .filter(a => a.status === "PENDING")
+                .map(a => [a.id, a])
+            ).values()
+          ).map(appointment => (
             <Card
               key={appointment.id}
               className={`border transition-all overflow-hidden ${
