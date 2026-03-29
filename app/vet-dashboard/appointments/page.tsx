@@ -1,37 +1,33 @@
-"use client"
-      ) : (
-        <div className="space-y-6">
-          {Array.from(
-            new Map(
-              appointments
-                .filter(a => a.status === "PENDING")
-                .map(a => [a.id, a])
-            ).values()
-          ).map(appointment => (
-            <Card
-              key={appointment.id}
-              className={`border transition-all overflow-hidden ${
-                appointment.status === "CONFIRMED"
-                  ? "border-emerald-200 bg-emerald-500/5"
-                  : appointment.status === "CANCELLED"
-                  ? "border-red-200 bg-red-500/5 opacity-60"
-                  : "border-border hover:border-primary/50"
-              }`}>
-              <div className="flex flex-col lg:flex-row h-full">
-  }
-  analysis?: {
-    id: string
-    imageUrl: string
-    detectedDisease: string
-    confidence: number
-    healthy: number
-    footAndMouth: number
-    lumpySkin: number
-    anthrax: number
-  } | null
-}
+"use client";
 
+import React, { useState, useEffect } from "react";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { AlertCircle, Check, X, Clock, User } from "lucide-react";
 import { getPublicImageUrl } from "@/lib/public-image-url";
+
+// Types
+type Appointment = {
+  id: string;
+  user: {
+    name: string;
+    email: string;
+  };
+  appointmentDate: string;
+  reason?: string;
+  status: "PENDING" | "CONFIRMED" | "CANCELLED";
+  analysis?: {
+    id: string;
+    imageUrl: string;
+    detectedDisease: string;
+    confidence: number;
+    healthy: number;
+    footAndMouth: number;
+    lumpySkin: number;
+    anthrax: number;
+  } | null;
+};
+
 function resolveAnalysisImageUrl(imageUrl?: string | null): string | null {
   if (!imageUrl) return null;
   if (imageUrl.startsWith("http")) return imageUrl;
