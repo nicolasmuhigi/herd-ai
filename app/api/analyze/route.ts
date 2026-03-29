@@ -527,7 +527,7 @@ out body geom;`;
     };
 
     if (!data.elements || data.elements.length === 0) {
-      console.log(`✗ No veterinary clinics found within ~15km radius`);
+      console.log(`No local clinics found, using AVEP Co Ltd as fallback.`);
       return await searchVeterinaryClinicByDistrict(latitude, longitude);
     }
 

@@ -190,37 +190,58 @@ export async function PATCH(req: NextRequest) {
       data: { status },
     });
 
-    // Send confirmation email if approved
-    if (status === "CONFIRMED") {
-      try {
-        const confirmationEmail = `
-          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-            <h2 style="color: #333;">Appointment Confirmed!</h2>
-            <p>Your appointment has been confirmed by the veterinarian.</p>
-            
-            <div style="background-color: #f5f5f5; padding: 15px; border-radius: 5px;">
-              <p><strong>Veterinarian:</strong> ${vet.name}</p>
-              <p><strong>Date:</strong> ${appointment.appointmentDate.toLocaleString()}</p>
-              ${appointment.reason ? `<p><strong>Reason:</strong> ${appointment.reason}</p>` : ""}
-            </div>
-            
-            <p style="margin-top: 20px;">
-              Please arrive 10-15 minutes before your scheduled appointment time.
-            </p>
-            
-            <p style="margin-top: 20px; color: #666; font-size: 12px;">
-              If you need to reschedule or cancel, please contact us as soon as possible.
-            </p>
-          </div>
-        `;
 
+    // Send email to user if approved or declined
+    if (status === "CONFIRMED" || status === "CANCELLED") {
+      try {
+        let subject = "";
+        let html = "";
+        if (status === "CONFIRMED") {
+          subject = "Your Appointment Has Been Confirmed";
+          html = `
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+              <h2 style="color: #333;">Appointment Confirmed!</h2>
+              <p>Your appointment has been confirmed by the veterinarian.</p>
+              <div style="background-color: #f5f5f5; padding: 15px; border-radius: 5px;">
+                <p><strong>Veterinarian:</strong> ${vet.name}</p>
+                <p><strong>Date:</strong> ${appointment.appointmentDate.toLocaleString()}</p>
+                ${appointment.reason ? `<p><strong>Reason:</strong> ${appointment.reason}</p>` : ""}
+              </div>
+              <p style="margin-top: 20px;">
+                Please arrive 10-15 minutes before your scheduled appointment time.
+              </p>
+              <p style="margin-top: 20px; color: #666; font-size: 12px;">
+                If you need to reschedule or cancel, please contact AVEP Co Ltd at 0788 508 343 or visit us at KN 5 Rd, Kigali.
+              </p>
+            </div>
+          `;
+        } else if (status === "CANCELLED") {
+          subject = "Your Appointment Was Declined";
+          html = `
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+              <h2 style="color: #b00;">Appointment Declined</h2>
+              <p>We're sorry, but your appointment was declined by the veterinarian.</p>
+              <div style="background-color: #f5f5f5; padding: 15px; border-radius: 5px;">
+                <p><strong>Veterinarian:</strong> ${vet.name}</p>
+                <p><strong>Date:</strong> ${appointment.appointmentDate.toLocaleString()}</p>
+                ${appointment.reason ? `<p><strong>Reason:</strong> ${appointment.reason}</p>` : ""}
+              </div>
+              <p style="margin-top: 20px;">
+                You may book another appointment or contact the clinic for more information.
+              </p>
+              <p style="margin-top: 20px; color: #666; font-size: 12px;">
+                If you have questions, please reply to this email or contact support.
+              </p>
+            </div>
+          `;
+        }
         await sendEmail({
           to: appointment.user.email,
-          subject: "Your Appointment Has Been Confirmed",
-          html: confirmationEmail,
+          subject,
+          html,
         });
       } catch (emailError) {
-        console.error("Failed to send confirmation email:", emailError);
+        console.error("Failed to send appointment status email:", emailError);
         // Don't fail the update if email fails
       }
     }
