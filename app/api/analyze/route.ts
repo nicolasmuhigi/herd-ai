@@ -9,6 +9,7 @@ import {
 
 import { uploadImageToSupabase } from "@/lib/supabase-upload";
 import { v4 as uuidv4 } from "uuid";
+import FormData from "form-data";
 
 const DB_DISEASE_TYPES = new Set([
   "HEALTHY",
@@ -76,7 +77,7 @@ async function analyzeCattleImage(
       const response = await fetch(apiUrl, {
         method: "POST",
         headers: formData.getHeaders(),
-        body: formData,
+        body: formData as any,
       });
 
       if (!response.ok) {
