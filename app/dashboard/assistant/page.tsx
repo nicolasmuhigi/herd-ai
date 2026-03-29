@@ -197,8 +197,9 @@ function buildInitialAssistantMessage(analysisData: AnalysisData): string {
       ].join("\n")
     : [
         `**Nearest veterinary clinic according to your location (${locationDisplay}):**`,
-        `- No veterinary clinics found in nearby areas.`,
-        `- Please contact your local agricultural extension office or use the booking page to request a veterinarian.`,
+        `- **AVEP Co Ltd**`,
+        `- Address: KN 5 Rd, Kigali`,
+        `- Phone: 0788 508 343`,
       ].join("\n")
 
   return [
@@ -317,7 +318,7 @@ export default function AssistantPage() {
       const aiMsg: Message = {
         id: (Date.now() + 1).toString(),
         role: "assistant",
-        content: payload.response || "I couldn't generate a response. Please try again.",
+        content: payload && payload.response ? payload.response : "I couldn't generate a response. Please try again.",
       }
       setMessages((prev) => [...prev, aiMsg])
     } catch (error) {

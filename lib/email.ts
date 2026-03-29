@@ -102,7 +102,7 @@ export function generateConfirmationEmail(
       </div>
       
       <p style="margin-top: 20px;">
-        We look forward to seeing you soon! If you need to reschedule, please contact us.
+        We look forward to seeing you soon! If you need to reschedule, please contact AVEP Co Ltd at 0788 508 343 or visit us at KN 5 Rd, Kigali.
       </p>
       
       <p style="margin-top: 20px; color: #666; font-size: 12px;">
