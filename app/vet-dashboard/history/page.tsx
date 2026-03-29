@@ -1,3 +1,4 @@
+
 "use client"
 
 import { useState, useEffect } from "react"
@@ -5,6 +6,7 @@ import { CheckCircle2, Clock, AlertCircle, Edit2, Save, X, Download, Trash2 } fr
 import type { Analysis } from "@prisma/client"
 import { jsPDF } from "jspdf"
 import autoTable from "jspdf-autotable"
+import { getPublicImageUrl } from "@/lib/public-image-url";
 
 interface AppointmentWithAnalysis {
   id: string
@@ -23,15 +25,15 @@ interface AppointmentWithAnalysis {
   updatedAt: string
 }
 
+// Helper to resolve Supabase or legacy image URLs
+function resolveAnalysisImageUrl(imageUrl?: string | null): string | null {
+  if (!imageUrl) return null;
+  if (imageUrl.startsWith("http")) return imageUrl;
+  if (!imageUrl.startsWith("/")) return getPublicImageUrl(imageUrl);
+  return imageUrl;
+}
+
 export default function AppointmentHistoryPage() {
-    // Helper to resolve Supabase or legacy image URLs
-  import { getPublicImageUrl } from "@/lib/public-image-url";
-    function resolveAnalysisImageUrl(imageUrl?: string | null): string | null {
-      if (!imageUrl) return null;
-      if (imageUrl.startsWith("http")) return imageUrl;
-      if (!imageUrl.startsWith("/")) return getPublicImageUrl(imageUrl);
-      return imageUrl;
-    }
   const [appointments, setAppointments] = useState<AppointmentWithAnalysis[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState("")
